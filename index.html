@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador RC Solar</title>
+<style>
+:root {
+  --bg: #F3F5F9;
+  --surface: #FFFFFF;
+  --field: #F6F8FC;
+  --ink: #141D2B;
+  --muted: #566277;
+  --line: #DAE0EA;
+  --grid: #E7ECF3;
+  --carga: #D98A0B;
+  --carga-ink: #8A5300;
+  --desc: #1E6DB0;
+  --desc-ink: #154F82;
+  --exp: #141D2B;
+  --warn-bg: #FFF0D2;
+  --warn-ink: #7A4A00;
+  --focus: #1E6DB0;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: "Avenir Next", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1520; --surface: #162030; --field: #1B2739; --ink: #E5EAF3; --muted: #99A6BA;
+    --line: #27354B; --grid: #223047; --carga: #F2B04A; --carga-ink: #F2B04A;
+    --desc: #5BA9E8; --desc-ink: #7DBDF0; --exp: #E5EAF3; --warn-bg: #3A2B10; --warn-ink: #F2B04A; --focus: #7DBDF0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1520; --surface: #162030; --field: #1B2739; --ink: #E5EAF3; --muted: #99A6BA;
+  --line: #27354B; --grid: #223047; --carga: #F2B04A; --carga-ink: #F2B04A;
+  --desc: #5BA9E8; --desc-ink: #7DBDF0; --exp: #E5EAF3; --warn-bg: #3A2B10; --warn-ink: #F2B04A; --focus: #7DBDF0;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; }
+.app { max-width: 1260px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 44px; }
+
+header { display: flex; flex-direction: column; gap: 6px; margin-bottom: 22px; }
+h1 { font-family: var(--serif); font-size: clamp(1.6rem, 3.4vw, 2.3rem); line-height: 1.12; font-weight: 700; margin: 0; text-wrap: balance; }
+.lead { margin: 0; color: var(--muted); max-width: 70ch; }
+.eyebrow { font-size: 12px; letter-spacing: .09em; text-transform: uppercase; font-weight: 700; color: var(--carga-ink); }
+
+.layout { display: grid; gap: 24px; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 940px) { .layout { grid-template-columns: 330px minmax(0, 1fr); } .rail { position: sticky; top: 16px; } }
+
+.rail { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 18px; }
+fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+legend { padding: 0; margin-bottom: 8px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--muted); }
+.row { display: grid; grid-template-columns: 1fr 112px; gap: 10px; align-items: center; }
+.row label { font-size: 14px; }
+.row .hint { display: block; font-size: 12px; color: var(--muted); }
+.field { position: relative; }
+input[type="number"], select {
+  width: 100%; font: inherit; font-family: var(--mono); font-size: 14px; color: var(--ink); background: var(--field);
+  border: 1px solid var(--line); border-radius: 6px; padding: 7px 34px 7px 9px; font-variant-numeric: tabular-nums;
+}
+select { padding-right: 9px; font-family: var(--sans); }
+.unit { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--muted); pointer-events: none; }
+input[type="range"] { width: 100%; accent-color: var(--desc); }
+.range-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+.range-row output { font-family: var(--mono); font-size: 14px; min-width: 2ch; text-align: right; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+button { font: inherit; font-size: 13px; color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+button:hover { border-color: var(--desc); }
+button.primary { background: var(--desc); border-color: var(--desc); color: #fff; }
+.file-line { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+input[type="file"] { font-size: 12.5px; max-width: 100%; color: var(--muted); }
+.note { font-size: 12.5px; color: var(--muted); margin: 0; }
+
+.msg { background: var(--warn-bg); color: var(--warn-ink); border-radius: 6px; padding: 10px 12px; font-size: 14px; }
+
+.results { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border-block: 1px solid var(--line); }
+@media (min-width: 720px) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+.kpi { padding: 14px 14px 14px 16px; border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.kpi:first-child { border-left: 0; padding-left: 0; }
+@media (max-width: 719px) { .kpi:nth-child(odd) { border-left: 0; padding-left: 0; } .kpi:nth-child(n+3) { border-top: 1px solid var(--line); } }
+.kpi .k { font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.kpi .v { font-family: var(--serif); font-size: clamp(1.4rem, 2.6vw, 1.95rem); font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.kpi .s { font-size: 12.5px; color: var(--muted); }
+.chip { display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 99px; background: var(--warn-bg); color: var(--warn-ink); font-size: 12px; font-weight: 600; }
+
+.valid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 18px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+@media (min-width: 720px) { .valid { grid-template-columns: repeat(4, 1fr); } }
+.valid .k { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+.valid .v { font-family: var(--mono); font-size: 18px; font-variant-numeric: tabular-nums; }
+.valid .wide { grid-column: 1 / -1; font-size: 13px; color: var(--muted); }
+
+.chart h2 { font-size: 15px; margin: 0; font-weight: 700; }
+.chart-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; align-items: baseline; margin-bottom: 4px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 20px; height: 0; border-top: 2.5px solid; }
+.sw.dash { border-top-style: dashed; }
+.sw.dot { width: 8px; height: 8px; border: 0; border-radius: 50%; background: var(--exp); }
+.sw.band { width: 14px; height: 10px; border: 0; background: var(--desc); opacity: .18; }
+.plot { width: 100%; }
+.plot svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.plot text { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
+.plot .axis { stroke: var(--line); stroke-width: 1; }
+.plot .gridl { stroke: var(--grid); stroke-width: 1; }
+.plot .cur { stroke: var(--ink); stroke-width: 1; opacity: .55; }
+.readout { font-family: var(--mono); font-size: 13px; color: var(--muted); min-height: 1.6em; font-variant-numeric: tabular-nums; }
+
+details { border-top: 1px solid var(--line); padding-top: 12px; }
+summary { cursor: pointer; font-weight: 600; }
+details p, details li { color: var(--muted); font-size: 14px; max-width: 78ch; }
+.eq { font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--ink); margin: 4px 0; }
+.steps { margin: 8px 0 0; padding-left: 20px; color: var(--muted); font-size: 14px; max-width: 78ch; }
+.steps li { margin-bottom: 2px; }
+.presets button[aria-pressed="true"] { background: var(--desc); border-color: var(--desc); color: #fff; font-weight: 600; }
+.cur-note { font-size: 13px; color: var(--ink); margin: 2px 0 0; padding: 8px 10px; background: var(--field); border-radius: 6px; border: 1px solid var(--line); }
+textarea { width: 100%; min-height: 96px; resize: vertical; font-family: var(--mono); font-size: 13px; color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+.capt { margin: 0 0 6px; font-size: 13px; color: var(--muted); max-width: 80ch; }
+.kdesc { margin: 0; padding-left: 18px; }
+footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <span class="eyebrow">Física II · Circuito RC</span>
+    <h1>Simulador de respaldo solar con banco de capacitores</h1>
+    <p class="lead">Un panel carga el banco durante el día; cuando hay un corte, el banco alimenta una carga (LED). Cambie los valores y observe cómo cambian el voltaje, la corriente y la energía.</p>
+    <ol class="steps">
+      <li>Elija un <b>escenario de ejemplo</b> (botones de la izquierda) o cambie los valores del circuito.</li>
+      <li>Lea los <b>cuatro indicadores</b>: cuánta energía guarda el banco y cuánto tiempo puede alimentar la carga.</li>
+      <li>Observe las <b>gráficas</b>: qué pasa con el voltaje, la corriente y la energía mientras hay sol y durante el corte.</li>
+      <li>Opcional: si construyó el circuito, <b>compare con sus mediciones</b> (última sección de la izquierda).</li>
+    </ol>
+  </header>
+
+  <div class="layout">
+    <form class="rail" id="rail" onsubmit="return false" autocomplete="off">
+      <fieldset>
+        <legend>Escenarios de ejemplo</legend>
+        <div class="presets">
+          <button type="button" data-preset="base" aria-pressed="false">Base</button>
+          <button type="button" data-preset="uno" aria-pressed="false">Un capacitor</button>
+          <button type="button" data-preset="grande" aria-pressed="false">Banco de 5 F</button>
+          <button type="button" data-preset="completa" aria-pressed="false">Carga completa</button>
+        </div>
+        <p class="cur-note" id="presetNote" role="status"></p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Fuente y resistencias</legend>
+        <div class="row"><label for="vs">Voltaje del panel <span class="hint">V<sub>s</sub></span></label><div class="field"><input id="vs" type="number" step="any" min="0.1" value="5"><span class="unit">V</span></div></div>
+        <div class="row"><label for="r">Resistencia de carga <span class="hint">R, en serie con el panel</span></label><div class="field"><input id="r" type="number" step="any" min="0.1" value="220"><span class="unit">Ω</span></div></div>
+        <div class="row"><label for="rl">Resistencia de la carga <span class="hint">R<sub>L</sub> (LED)</span></label><div class="field"><input id="rl" type="number" step="any" min="0.1" value="1000"><span class="unit">Ω</span></div></div>
+        <div class="row"><label for="vmin">Voltaje mínimo útil <span class="hint">debajo, el LED no funciona</span></label><div class="field"><input id="vmin" type="number" step="any" min="0" value="1.8"><span class="unit">V</span></div></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Banco de capacitores</legend>
+        <div class="row"><label for="c">Capacitancia de cada uno <span class="hint">4700 µF = 0.0047 F</span></label><div class="field"><input id="c" type="number" step="any" min="0.000001" value="1"><span class="unit">F</span></div></div>
+        <div>
+          <label for="n" style="font-size:14px">Cantidad de capacitores</label>
+          <div class="range-row"><input id="n" type="range" min="1" max="10" step="1" value="3"><output id="nOut" for="n">3</output></div>
+        </div>
+        <div class="row"><label for="arreglo">Conexión</label><select id="arreglo"><option value="paralelo">Paralelo</option><option value="serie">Serie</option><option value="mixto">Mixto</option></select></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Escenario en el tiempo</legend>
+        <div class="row"><label for="tt">Duración simulada</label><div class="field"><input id="tt" type="number" step="any" min="1" value="900"><span class="unit">s</span></div></div>
+        <div class="row"><label for="tci">Inicio del corte</label><div class="field"><input id="tci" type="number" step="any" min="0" value="400"><span class="unit">s</span></div></div>
+        <div class="row"><label for="tcf">Fin del corte</label><div class="field"><input id="tcf" type="number" step="any" min="0" value="900"><span class="unit">s</span></div></div>
+        <div class="row"><label for="metodo">Método numérico</label><select id="metodo"><option value="rk4">Runge-Kutta 4</option><option value="euler">Euler</option></select></div>
+        <div class="row"><label for="dt">Paso de cálculo <span class="hint">más chico = más lento</span></label><div class="field"><input id="dt" type="number" step="any" min="0.001" value="0.05"><span class="unit">s</span></div></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Sus mediciones (opcional)</legend>
+        <p class="note">Solo si construyó el circuito y midió el voltaje del capacitor con un multímetro. Escriba abajo lo que midió, una línea por medición: <b>tiempo en segundos</b>, un espacio o coma, y <b>voltaje en voltios</b>. Los puntos aparecen en la gráfica de voltaje y se calcula el error. Si no tiene mediciones, ignore esta sección.</p>
+        <label for="meas" style="font-size:14px">Sus mediciones</label>
+        <textarea id="meas" spellcheck="false" placeholder="0, 0.02&#10;20, 0.55&#10;40, 0.98&#10;(tiempo en s, voltaje en V; use punto decimal)"></textarea>
+        <p class="note" id="measStatus">Sin mediciones (opcional).</p>
+        <div class="presets">
+          <button type="button" id="sample">Ver un ejemplo</button>
+          <button type="button" id="clearExp">Borrar mediciones</button>
+        </div>
+        <details style="border-top:0;padding-top:0">
+          <summary style="font-weight:500;font-size:13px">¿Prefiere cargar un archivo CSV?</summary>
+          <p class="note">Un archivo de texto con dos columnas (tiempo_s, voltaje_v). Su contenido se copia en el cuadro de arriba.</p>
+          <input id="csv" type="file" accept=".csv,text/csv,text/plain" aria-label="Archivo CSV con columnas tiempo_s y voltaje_v">
+        </details>
+        <p class="note">El ejemplo son datos sintéticos: sirven solo para ver cómo funciona.</p>
+      </fieldset>
+    </form>
+
+    <main class="results">
+      <div id="msg" class="msg" role="alert" hidden></div>
+
+      <section class="kpis" aria-label="Resultados principales">
+        <div class="kpi"><span class="k">Capacitancia equivalente</span><span class="v" id="kCeq">—</span><span class="s" id="kCeqS"></span></div>
+        <div class="kpi"><span class="k">Constante de tiempo</span><span class="v" id="kTau">—</span><span class="s" id="kTauS"></span></div>
+        <div class="kpi"><span class="k">Energía al iniciar el corte</span><span class="v" id="kE">—</span><span class="s" id="kES"></span></div>
+        <div class="kpi"><span class="k">Autonomía útil</span><span class="v" id="kAut">—</span><span class="s" id="kAutS"></span><span class="chip" id="kAutChip" hidden></span></div>
+      </section>
+
+      <section class="valid" id="valid" aria-label="Comparación con mediciones" hidden>
+        <div><div class="k">Puntos medidos</div><div class="v" id="vN">0</div></div>
+        <div><div class="k">Error relativo medio</div><div class="v" id="vMean">—</div></div>
+        <div><div class="k">Error relativo máximo</div><div class="v" id="vMax">—</div></div>
+        <div><div class="k">Error absoluto medio</div><div class="v" id="vAbs">—</div></div>
+        <div class="wide" id="vNote"></div>
+      </section>
+
+      <section class="chart">
+        <div class="chart-head"><h2>Voltaje del banco</h2>
+          <div class="legend">
+            <span><i class="sw" style="border-color:var(--carga)"></i>Simulado · carga</span>
+            <span><i class="sw" style="border-color:var(--desc)"></i>Simulado · corte</span>
+            <span><i class="sw dash" style="border-color:var(--ink)"></i>Solución exacta</span>
+            <span id="lgExp" hidden><i class="sw dot"></i>Mediciones</span>
+            <span><i class="sw band"></i>Corte eléctrico</span>
+          </div>
+        </div>
+        <p class="capt">Cuánta tensión tiene el banco de capacitores. Sube mientras hay sol (línea ámbar) y baja durante el corte (línea azul). Si el voltaje baja de la línea punteada «V mín», la carga (LED) deja de funcionar.</p>
+        <div class="plot" id="plotV"></div>
+      </section>
+      <section class="chart">
+        <div class="chart-head"><h2>Corriente del circuito</h2></div>
+        <p class="capt">Cuánta corriente circula por el circuito. Es grande al empezar cada fase y disminuye; salta al iniciar el corte porque la corriente pasa a circular por la carga.</p>
+        <div class="plot" id="plotI"></div>
+      </section>
+      <section class="chart">
+        <div class="chart-head"><h2>Energía almacenada</h2></div>
+        <p class="capt">Energía guardada en el banco (E = ½·C·V²). Crece durante la carga y se gasta durante el corte.</p>
+        <div class="plot" id="plotE"></div>
+      </section>
+      <div class="readout" id="readout" aria-live="off">Pase el cursor (o el dedo) sobre las gráficas para leer valores.</div>
+
+      <details>
+        <summary>Qué significa cada dato y cómo leer las gráficas</summary>
+        <ul class="kdesc">
+          <li><b>Capacitancia equivalente:</b> capacidad total del banco según cuántos capacitores hay y cómo están conectados. Más capacitancia = más energía guardada, pero carga más lenta.</li>
+          <li><b>Constante de tiempo (τ):</b> la «velocidad» del circuito. El banco se llena en unas 5 veces τ. Se muestra la de carga y, debajo, la de descarga.</li>
+          <li><b>Energía al iniciar el corte:</b> cuánta energía tiene guardada el banco justo cuando se va la luz, y su voltaje en ese momento.</li>
+          <li><b>Autonomía útil:</b> cuánto tiempo puede mantener encendida la carga durante el corte, antes de que el voltaje baje del mínimo.</li>
+        </ul>
+        <p>Durante el día el panel carga el banco a través de R; durante el corte, el banco se descarga a través de la carga R<sub>L</sub>. La ecuación de cada fase es de primer orden:</p>
+        <p class="eq">R·C<sub>eq</sub>·dV<sub>c</sub>/dt + V<sub>c</sub> = V<sub>s</sub> &nbsp;(carga) &nbsp;·&nbsp; R<sub>L</sub>·C<sub>eq</sub>·dV<sub>c</sub>/dt + V<sub>c</sub> = 0 &nbsp;(corte)</p>
+        <p class="eq">V<sub>c</sub>(t) = V<sub>s</sub>(1 − e<sup>−t/RC</sup>) &nbsp;·&nbsp; V<sub>c</sub>(t) = V<sub>0</sub>e<sup>−t/(R<sub>L</sub>C)</sup> &nbsp;·&nbsp; E = ½·C<sub>eq</sub>·V<sub>c</sub>²</p>
+        <ul>
+          <li>La línea continua es la integración numérica; la discontinua es la solución exacta. Si coinciden, el método numérico es correcto.</li>
+          <li>Un capacitor se carga casi por completo en 5τ (τ = R·C<sub>eq</sub>): más capacitancia guarda más energía, pero tarda más en llenarse.</li>
+          <li>La autonomía es el tiempo, desde que empieza el corte, en que V<sub>c</sub> se mantiene sobre el voltaje mínimo. La autonomía teórica es R<sub>L</sub>·C<sub>eq</sub>·ln(V<sub>0</sub>/V<sub>mín</sub>).</li>
+          <li>Límites: el panel se modela como fuente constante y no se incluyen la resistencia interna del capacitor, las fugas ni la temperatura.</li>
+        </ul>
+      </details>
+    </main>
+  </div>
+  <footer>Proyecto final de Física II · Universidad Mariano Gálvez de Guatemala. Funciona sin conexión: todo el cálculo ocurre en este navegador.</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+
+  var SAMPLE_CSV = "tiempo_s,voltaje_v\n0.0,0.025\n20.0,0.142\n40.0,0.326\n60.0,0.511\n80.0,0.559\n100.0,0.691\n120.0,0.910\n140.0,0.994\n160.0,1.053\n180.0,1.221\n200.0,1.284\n220.0,1.394\n240.0,1.536\n260.0,1.532\n280.0,1.642\n300.0,1.798\n320.0,1.870\n340.0,2.029\n360.0,2.057\n380.0,2.118\n400.0,2.346\n420.0,2.246\n440.0,2.246\n460.0,2.156\n480.0,2.186\n500.0,2.204\n520.0,2.126\n540.0,2.188\n560.0,2.124\n580.0,2.126\n600.0,2.096\n620.0,2.204\n640.0,2.097\n660.0,2.031\n680.0,2.111\n700.0,1.995\n720.0,2.053\n740.0,1.931\n760.0,1.949\n780.0,2.012\n800.0,2.026\n820.0,1.984\n840.0,1.957\n860.0,1.934\n880.0,1.863\n";
+
+  var BASE = { vs: 5, r: 220, rl: 1000, c: 1, n: 3, arreglo: 'paralelo', metodo: 'rk4', tt: 900, tci: 400, tcf: 900, dt: 0.05, vmin: 1.8 };
+  function preset(over) { var o = {}, k; for (k in BASE) o[k] = BASE[k]; for (k in over) o[k] = over[k]; return o; }
+  var PRESETS = {
+    base: preset({}),
+    uno: preset({ n: 1 }),
+    grande: preset({ n: 5 }),
+    completa: preset({ tt: 7000, tci: 3300, tcf: 7000, dt: 0.1 })
+  };
+  var FIELDS = ['vs', 'r', 'rl', 'c', 'n', 'arreglo', 'metodo', 'tt', 'tci', 'tcf', 'dt', 'vmin'];
+  var TEXT_FIELDS = { arreglo: 1, metodo: 1 };
+
+  var state = { res: null, p: null, exp: null, expName: '', cursorT: null, idx: [], layout: null, active: 'base' };
+
+  /* ---------- física ---------- */
+  function ceqOf(c, n, arreglo) {
+    if (arreglo === 'paralelo') return n * c;
+    if (arreglo === 'serie') return c / n;
+    if (n < 2 || n % 2 !== 0) throw new Error('El arreglo mixto necesita una cantidad par de capacitores (2, 4, 6…).');
+    return 4 * c / n;
+  }
+  function describeBank(p) {
+    if (p.n === 1) return '1 capacitor de ' + fmt(p.c) + ' F';
+    if (p.arreglo === 'mixto') return '2 ramas en paralelo de ' + (p.n / 2) + ' en serie';
+    return p.n + ' × ' + fmt(p.c) + ' F en ' + p.arreglo;
+  }
+  function simulate(p) {
+    var ceq = ceqOf(p.c, p.n, p.arreglo);
+    var N = Math.round(p.tt / p.dt) + 1;
+    if (N > 600001) throw new Error('Con ese paso hay demasiados puntos (' + N.toLocaleString('es') + '). Aumente el paso de cálculo o reduzca la duración.');
+    var t = new Float64Array(N), vc = new Float64Array(N), cut = new Uint8Array(N), cur = new Float64Array(N), en = new Float64Array(N);
+    var h = p.tt / (N - 1), k;
+    function inCut(tk) { return tk >= p.tci && tk <= p.tcf + 1e-9; }
+    function f(v, c) { return c ? -v / (p.rl * ceq) : (p.vs - v) / (p.r * ceq); }
+    for (k = 0; k < N; k++) { t[k] = k * h; cut[k] = inCut(t[k]) ? 1 : 0; }
+    for (k = 0; k < N - 1; k++) {
+      var v = vc[k], c = cut[k], nv;
+      if (p.metodo === 'euler') {
+        nv = v + h * f(v, c);
+      } else {
+        var k1 = f(v, c), k2 = f(v + 0.5 * h * k1, c), k3 = f(v + 0.5 * h * k2, c), k4 = f(v + h * k3, c);
+        nv = v + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
+      }
+      vc[k + 1] = nv > 0 ? nv : 0;
+    }
+    for (k = 0; k < N; k++) {
+      cur[k] = cut[k] ? vc[k] / p.rl : (p.vs - vc[k]) / p.r;
+      en[k] = 0.5 * ceq * vc[k] * vc[k];
+    }
+    return { t: t, vc: vc, cut: cut, i: cur, e: en, N: N, h: h, ceq: ceq, tauC: p.r * ceq, tauD: p.rl * ceq };
+  }
+  function interp(res, x, arr) {
+    var t = res.t, N = res.N;
+    if (x <= t[0]) return arr[0];
+    if (x >= t[N - 1]) return arr[N - 1];
+    var pos = x / res.h, i0 = Math.floor(pos), fr = pos - i0;
+    return arr[i0] + (arr[Math.min(i0 + 1, N - 1)] - arr[i0]) * fr;
+  }
+  function autonomy(res, p) {
+    var N = res.N, first = -1, k;
+    for (k = 0; k < N; k++) { if (res.cut[k]) { first = k; break; } }
+    if (first < 0) return null;
+    var last = first;
+    for (k = first; k < N; k++) { if (res.cut[k]) last = k; }
+    var v0 = res.vc[first], sec = res.t[last] - res.t[first], limited = true;
+    for (k = first; k <= last; k++) {
+      if (res.vc[k] < p.vmin) { sec = res.t[k] - res.t[first]; limited = false; break; }
+    }
+    var theo = v0 > p.vmin ? p.rl * res.ceq * Math.log(v0 / p.vmin) : 0;
+    return { sec: sec, limited: limited, theo: theo, v0: v0 };
+  }
+
+  /* ---------- formato ---------- */
+  function fmt(x, d) {
+    if (!isFinite(x)) return '—';
+    if (d != null) return x.toFixed(d);
+    var a = Math.abs(x);
+    if (a === 0) return '0';
+    if (a >= 100) return String(Math.round(x));
+    if (a >= 10) return x.toFixed(1);
+    if (a >= 1) return x.toFixed(2);
+    return x.toPrecision(2);
+  }
+  function fmtT(s) { return s >= 120 ? Math.round(s) + ' s (' + (s / 60).toFixed(1) + ' min)' : s.toFixed(1) + ' s'; }
+
+  /* ---------- lectura de parámetros ---------- */
+  function readParams() {
+    var p = {}, i, key, el;
+    for (i = 0; i < FIELDS.length; i++) {
+      key = FIELDS[i]; el = $(key);
+      p[key] = TEXT_FIELDS[key] ? el.value : parseFloat(el.value);
+    }
+    return p;
+  }
+  function writeParams(p) {
+    FIELDS.forEach(function (k) { $(k).value = p[k]; });
+    $('nOut').textContent = p.n;
+  }
+  function validate(p) {
+    var need = ['vs', 'r', 'rl', 'c', 'dt', 'tt'];
+    for (var i = 0; i < need.length; i++) {
+      if (!(p[need[i]] > 0)) return 'Revise los valores: voltaje, resistencias, capacitancia, duración y paso deben ser mayores que cero.';
+    }
+    if (!(p.vmin >= 0) || !(p.tci >= 0) || !(p.tcf >= 0)) return 'Revise el voltaje mínimo y los tiempos del corte: no pueden estar vacíos ni ser negativos.';
+    if (p.tcf <= p.tci) return 'El corte debe terminar después de empezar: aumente el fin del corte o reduzca el inicio.';
+    return '';
+  }
+  function showMsg(text) { var m = $('msg'); m.textContent = text; m.hidden = !text; }
+
+  /* ---------- gráficas ---------- */
+  function niceStep(range, count) {
+    var raw = range / count, mag = Math.pow(10, Math.floor(Math.log10(raw))), r = raw / mag;
+    return (r < 1.5 ? 1 : r < 3 ? 2 : r < 7 ? 5 : 10) * mag;
+  }
+  function ticks(max, count) {
+    var step = niceStep(max, count), out = [], v;
+    for (v = 0; v <= max + step * 1e-6; v += step) out.push(+v.toFixed(10));
+    return { list: out, top: out[out.length - 1] >= max ? out[out.length - 1] : out[out.length - 1] + step, step: step };
+  }
+  function tickLabel(v, step) {
+    var d = step >= 1 ? 0 : Math.min(4, Math.ceil(-Math.log10(step)));
+    return v.toFixed(d);
+  }
+  function pathOf(xs, ys, sx, sy) {
+    var s = '', k;
+    for (k = 0; k < xs.length; k++) s += (k ? 'L' : 'M') + sx(xs[k]).toFixed(1) + ' ' + sy(ys[k]).toFixed(1);
+    return s;
+  }
+  function sampleIdx(N) {
+    var step = Math.max(1, Math.floor(N / 700)), a = [], k;
+    for (k = 0; k < N; k += step) a.push(k);
+    if (a[a.length - 1] !== N - 1) a.push(N - 1);
+    return a;
+  }
+
+  function buildChart(spec) {
+    var W = spec.W, H = spec.H, L = 54, R = 14, T = 14, B = 30;
+    var pw = W - L - R, ph = H - T - B;
+    var ty = ticks(spec.yMax, 4), yTop = ty.top, tx = ticks(spec.xMax, W < 460 ? 4 : 6);
+    function sx(x) { return L + x / spec.xMax * pw; }
+    function sy(y) { return T + ph - y / yTop * ph; }
+    var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + spec.label + '">';
+    ty.list.forEach(function (v) {
+      out += '<line class="gridl" x1="' + L + '" x2="' + (W - R) + '" y1="' + sy(v).toFixed(1) + '" y2="' + sy(v).toFixed(1) + '"/>' +
+        '<text x="' + (L - 7) + '" y="' + (sy(v) + 4).toFixed(1) + '" text-anchor="end">' + tickLabel(v, ty.step) + '</text>';
+    });
+    tx.list.forEach(function (v) {
+      if (v > spec.xMax) return;
+      out += '<line class="axis" x1="' + sx(v).toFixed(1) + '" x2="' + sx(v).toFixed(1) + '" y1="' + (T + ph) + '" y2="' + (T + ph + 4) + '"/>' +
+        '<text x="' + sx(v).toFixed(1) + '" y="' + (H - 9) + '" text-anchor="middle">' + tickLabel(v, tx.step) + '</text>';
+    });
+    out += '<line class="axis" x1="' + L + '" x2="' + (W - R) + '" y1="' + (T + ph) + '" y2="' + (T + ph) + '"/>';
+    out += '<text x="' + L + '" y="' + (T - 3) + '" style="font-weight:600">' + spec.yLabel + '</text>';
+    out += '<text x="' + (W - R) + '" y="' + (T - 3) + '" text-anchor="end" style="font-weight:600">t [s]</text>';
+    if (spec.band) {
+      var b0 = sx(Math.max(0, spec.band[0])), b1 = sx(Math.min(spec.xMax, spec.band[1]));
+      if (b1 > b0) out += '<rect x="' + b0.toFixed(1) + '" y="' + T + '" width="' + (b1 - b0).toFixed(1) + '" height="' + ph + '" fill="var(--desc)" opacity="0.13"/>';
+    }
+    (spec.hlines || []).forEach(function (hl) {
+      if (hl.y > yTop) return;
+      out += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + sy(hl.y).toFixed(1) + '" y2="' + sy(hl.y).toFixed(1) + '" stroke="var(--carga-ink)" stroke-width="1.2" stroke-dasharray="2 4"/>' +
+        '<text x="' + (L + 6) + '" y="' + (sy(hl.y) - 5).toFixed(1) + '" style="fill:var(--carga-ink)">' + hl.label + '</text>';
+    });
+    spec.series.forEach(function (s) {
+      if (s.xs.length < 2) return;
+      out += '<path d="' + pathOf(s.xs, s.ys, sx, sy) + '" fill="none" stroke="' + s.color + '" stroke-width="' + (s.w || 2) + '"' +
+        (s.dash ? ' stroke-dasharray="6 5"' : '') + ' stroke-linejoin="round" stroke-linecap="round"/>';
+    });
+    (spec.points || []).forEach(function (pt) {
+      if (pt[0] > spec.xMax || pt[1] > yTop) return;
+      out += '<circle cx="' + sx(pt[0]).toFixed(1) + '" cy="' + sy(pt[1]).toFixed(1) + '" r="3.2" fill="var(--exp)"/>';
+    });
+    out += '<line class="cur" data-cur y1="' + T + '" y2="' + (T + ph) + '" x1="-10" x2="-10"/>';
+    out += '<rect data-hit x="' + L + '" y="' + T + '" width="' + pw + '" height="' + ph + '" fill="transparent"/>';
+    out += '</svg>';
+    return { html: out, L: L, pw: pw };
+  }
+
+  function analyticSeries(p, res) {
+    var tau = p.r * res.ceq, tauL = p.rl * res.ceq, segs = [], n = 160, k, xs, ys, t;
+    var tci = Math.min(p.tci, p.tt), tcf = Math.min(p.tcf, p.tt);
+    function seg(color, a, b, fn) {
+      if (b <= a) return;
+      xs = []; ys = [];
+      for (k = 0; k <= n; k++) { t = a + (b - a) * k / n; xs.push(t); ys.push(fn(t)); }
+      segs.push({ xs: xs, ys: ys, color: color, dash: true, w: 1.6 });
+    }
+    var vAtCut = p.vs * (1 - Math.exp(-p.tci / tau));
+    seg('var(--ink)', 0, tci, function (x) { return p.vs * (1 - Math.exp(-x / tau)); });
+    if (p.tci < p.tt) {
+      seg('var(--ink)', p.tci, tcf, function (x) { return vAtCut * Math.exp(-(x - p.tci) / tauL); });
+      if (p.tcf < p.tt) {
+        var vEnd = vAtCut * Math.exp(-(p.tcf - p.tci) / tauL);
+        seg('var(--ink)', p.tcf, p.tt, function (x) { return p.vs + (vEnd - p.vs) * Math.exp(-(x - p.tcf) / tau); });
+      }
+    }
+    return segs;
+  }
+
+  function coloredSeries(res, arr, idx, scale) {
+    var out = [], cur = null, k, i, cutNow, last = null;
+    for (k = 0; k < idx.length; k++) {
+      i = idx[k]; cutNow = res.cut[i];
+      if (!cur || cur.cut !== cutNow) {
+        if (cur && last) { cur.xs.push(res.t[i]); cur.ys.push(arr[i] * scale); }
+        cur = { xs: [], ys: [], cut: cutNow, color: cutNow ? 'var(--desc)' : 'var(--carga)', w: 2.4 };
+        out.push(cur);
+      }
+      cur.xs.push(res.t[i]); cur.ys.push(arr[i] * scale); last = i;
+    }
+    return out;
+  }
+
+  function drawCharts() {
+    var res = state.res, p = state.p;
+    if (!res) return;
+    var host = $('plotV'), W = Math.max(280, Math.floor(host.clientWidth || 600)), H = W < 460 ? 210 : 250;
+    var idx = state.idx;
+    var maxV = 0, maxI = 0, maxE = 0, k;
+    for (k = 0; k < res.N; k++) { if (res.vc[k] > maxV) maxV = res.vc[k]; if (res.i[k] > maxI) maxI = res.i[k]; if (res.e[k] > maxE) maxE = res.e[k]; }
+    var expPts = state.exp || [];
+    expPts.forEach(function (q) { if (q[0] <= p.tt && q[1] > maxV) maxV = q[1]; });
+    maxV = Math.max(maxV, p.vs * 0.05, p.vmin);
+    var iScale = maxI < 1 ? 1000 : 1, iUnit = iScale === 1000 ? 'mA' : 'A';
+    var band = [p.tci, p.tcf];
+
+    var cv = buildChart({
+      W: W, H: H, xMax: p.tt, yMax: maxV * 1.06, yLabel: 'Vc [V]', label: 'Voltaje del banco de capacitores en el tiempo',
+      band: band, hlines: [{ y: p.vmin, label: 'V mín ' + fmt(p.vmin) + ' V' }],
+      series: analyticSeries(p, res).concat(coloredSeries(res, res.vc, idx, 1)), points: expPts.filter(function (q) { return q[0] <= p.tt; })
+    });
+    var ci = buildChart({
+      W: W, H: H, xMax: p.tt, yMax: Math.max(maxI * iScale, 1e-9) * 1.06, yLabel: 'I [' + iUnit + ']', label: 'Corriente del circuito en el tiempo',
+      band: band, series: coloredSeries(res, res.i, idx, iScale)
+    });
+    var ce = buildChart({
+      W: W, H: H, xMax: p.tt, yMax: Math.max(maxE, 1e-9) * 1.06, yLabel: 'E [J]', label: 'Energía almacenada en el banco de capacitores en el tiempo',
+      band: band, series: coloredSeries(res, res.e, idx, 1)
+    });
+    $('plotV').innerHTML = cv.html; $('plotI').innerHTML = ci.html; $('plotE').innerHTML = ce.html;
+    state.layout = { W: W, L: cv.L, pw: cv.pw, iScale: iScale, iUnit: iUnit };
+    bindCursor();
+    if (state.cursorT != null) setCursor(state.cursorT);
+  }
+
+  /* ---------- cursor ---------- */
+  function bindCursor() {
+    ['plotV', 'plotI', 'plotE'].forEach(function (id) {
+      var svg = $(id).querySelector('svg');
+      if (!svg) return;
+      var hit = svg.querySelector('[data-hit]');
+      function move(ev) {
+        var r = svg.getBoundingClientRect(), scale = state.layout.W / r.width;
+        var x = (ev.clientX - r.left) * scale, fr = (x - state.layout.L) / state.layout.pw;
+        fr = Math.min(1, Math.max(0, fr));
+        setCursor(fr * state.p.tt);
+      }
+      hit.addEventListener('pointermove', move);
+      hit.addEventListener('pointerdown', move);
+      hit.addEventListener('pointerleave', function () { state.cursorT = null; hideCursor(); });
+    });
+  }
+  function hideCursor() {
+    document.querySelectorAll('[data-cur]').forEach(function (l) { l.setAttribute('x1', -10); l.setAttribute('x2', -10); });
+    $('readout').textContent = 'Pase el cursor (o el dedo) sobre las gráficas para leer valores.';
+  }
+  function setCursor(t) {
+    var res = state.res, p = state.p, ly = state.layout;
+    if (!res || !ly) return;
+    state.cursorT = t;
+    var x = ly.L + t / p.tt * ly.pw;
+    document.querySelectorAll('[data-cur]').forEach(function (l) { l.setAttribute('x1', x.toFixed(1)); l.setAttribute('x2', x.toFixed(1)); });
+    var k = Math.min(res.N - 1, Math.max(0, Math.round(t / res.h)));
+    $('readout').textContent = 't = ' + fmt(res.t[k], res.t[k] >= 100 ? 0 : 1) + ' s · ' + (res.cut[k] ? 'corte' : 'carga') +
+      ' · Vc = ' + fmt(res.vc[k], 3) + ' V · I = ' + fmt(res.i[k] * ly.iScale, 2) + ' ' + ly.iUnit + ' · E = ' + fmt(res.e[k], 2) + ' J';
+  }
+
+  /* ---------- resultados ---------- */
+  function renderKpis() {
+    var res = state.res, p = state.p;
+    $('kCeq').textContent = fmt(res.ceq, res.ceq < 1 ? 3 : 2) + ' F';
+    $('kCeqS').textContent = describeBank(p);
+    $('kTau').textContent = fmtT(res.tauC);
+    $('kTauS').textContent = 'descarga: ' + Math.round(res.tauD) + ' s · lleno en ≈ ' + Math.round(5 * res.tauC) + ' s';
+    if (p.tci <= p.tt) {
+      var vAt = interp(res, p.tci, res.vc), eAt = interp(res, p.tci, res.e);
+      $('kE').textContent = fmt(eAt, 2) + ' J';
+      $('kES').textContent = 'Vc = ' + fmt(vAt, 2) + ' V al iniciar el corte';
+    } else {
+      $('kE').textContent = '—'; $('kES').textContent = 'El corte empieza después del tiempo simulado';
+    }
+    var a = autonomy(res, p), chip = $('kAutChip');
+    chip.hidden = true;
+    if (!a) {
+      $('kAut').textContent = '—'; $('kAutS').textContent = 'No hay corte dentro del tiempo simulado';
+      return;
+    }
+    $('kAut').textContent = (a.limited && a.sec > 0 ? '≥ ' : '') + fmtT(a.sec);
+    if (a.sec === 0) {
+      $('kAutS').textContent = 'Vc = ' + fmt(a.v0, 2) + ' V al empezar el corte';
+      chip.textContent = 'No alcanza el voltaje mínimo'; chip.hidden = false;
+    } else if (a.limited) {
+      $('kAutS').textContent = 'teórica: ' + fmtT(a.theo);
+      chip.textContent = 'Limitada por el fin del corte simulado'; chip.hidden = false;
+    } else {
+      $('kAutS').textContent = 'teórica: ' + fmtT(a.theo) + ' (Vc ≥ ' + fmt(p.vmin) + ' V)';
+    }
+  }
+
+  function renderValidation() {
+    var box = $('valid'), res = state.res, p = state.p;
+    $('lgExp').hidden = !state.exp;
+    if (!state.exp) { box.hidden = true; return; }
+    var rel = [], abs = [], used = 0;
+    state.exp.forEach(function (q) {
+      if (q[0] < 0 || q[0] > p.tt) return;
+      var vt = interp(res, q[0], res.vc);
+      used++; abs.push(Math.abs(vt - q[1]));
+      if (vt > 1e-9) rel.push(Math.abs(vt - q[1]) / vt * 100);
+    });
+    box.hidden = false;
+    $('vN').textContent = used + ' de ' + state.exp.length;
+    if (!used || !rel.length) {
+      $('vMean').textContent = '—'; $('vMax').textContent = '—'; $('vAbs').textContent = '—';
+      $('vNote').textContent = 'Ningún punto cae dentro del tiempo simulado. Aumente la duración.';
+      return;
+    }
+    var mean = rel.reduce(function (a, b) { return a + b; }, 0) / rel.length, mx = Math.max.apply(null, rel);
+    var am = abs.reduce(function (a, b) { return a + b; }, 0) / abs.length;
+    $('vMean').textContent = mean.toFixed(2) + ' %'; $('vMax').textContent = mx.toFixed(2) + ' %'; $('vAbs').textContent = am.toFixed(3) + ' V';
+    $('vNote').textContent = (state.expName ? 'Origen: ' + state.expName + '. ' : '') +
+      'El error relativo se dispara donde el voltaje es muy pequeño (al inicio de la carga); revise también el error absoluto. Use en los parámetros los valores medidos de R, C y Vs.';
+  }
+
+  var scheduled = false;
+  function schedule() { if (scheduled) return; scheduled = true; requestAnimationFrame(function () { scheduled = false; update(); }); }
+  function update() {
+    var p = readParams();
+    $('nOut').textContent = isFinite(p.n) ? p.n : '';
+    var bad = validate(p);
+    if (bad) { showMsg(bad); return; }
+    try {
+      var res = simulate(p);
+      showMsg('');
+      state.p = p; state.res = res; state.idx = sampleIdx(res.N);
+      renderKpis(); renderValidation(); drawCharts();
+    } catch (e) { showMsg(e.message); }
+  }
+
+  /* ---------- mediciones escritas o cargadas ---------- */
+  function parsePasted(text) {
+    var pts = [];
+    text.split(/\r?\n/).forEach(function (ln) {
+      var t = ln.trim().split(/[\s,;]+/).filter(Boolean);
+      if (t.length < 2) return;
+      var a = Number(t[0]), b = Number(t[1]);
+      if (isFinite(a) && isFinite(b)) pts.push([a, b]);
+    });
+    return pts;
+  }
+  function readMeas() {
+    var text = $('meas').value, pts = parsePasted(text), st = $('measStatus');
+    if (pts.length >= 2) {
+      state.exp = pts; state.expName = 'mediciones escritas o cargadas';
+      st.textContent = pts.length + ' mediciones leídas.';
+    } else {
+      state.exp = null; state.expName = '';
+      st.textContent = text.trim() ? 'Escriba al menos 2 líneas con tiempo y voltaje (use punto decimal).' : 'Sin mediciones (opcional).';
+    }
+    update();
+  }
+
+  /* ---------- escenarios ---------- */
+  var PRESET_TEXT = {
+    base: 'Base — 3 capacitores de 1 F en paralelo; corte de 400 s a 900 s.',
+    uno: 'Un capacitor — un solo capacitor de 1 F; se carga más rápido.',
+    grande: 'Banco de 5 F — 5 capacitores de 1 F; guarda más energía, pero con solo 400 s de carga no alcanza el voltaje mínimo.',
+    completa: 'Carga completa — 3 capacitores con tiempo de sol suficiente (3300 s): el banco se llena y dura mucho más.'
+  };
+  function setActive(key) {
+    state.active = key;
+    document.querySelectorAll('[data-preset]').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-preset') === key ? 'true' : 'false');
+    });
+    $('presetNote').textContent = key ? 'Escenario actual: ' + PRESET_TEXT[key] : 'Escenario actual: personalizado (usted cambió algún valor).';
+  }
+
+  /* ---------- eventos ---------- */
+  function onEdit() { setActive(null); schedule(); }
+  FIELDS.forEach(function (k) { $(k).addEventListener('input', onEdit); $(k).addEventListener('change', onEdit); });
+  document.querySelectorAll('[data-preset]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var key = b.getAttribute('data-preset');
+      writeParams(PRESETS[key]); setActive(key); state.cursorT = null; update();
+    });
+  });
+  $('meas').addEventListener('input', readMeas);
+  $('csv').addEventListener('change', function (ev) {
+    var f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () { $('meas').value = String(rd.result); readMeas(); };
+    rd.onerror = function () { showMsg('No se pudo leer el archivo.'); };
+    rd.readAsText(f);
+  });
+  $('sample').addEventListener('click', function () {
+    writeParams(PRESETS.base); setActive('base');
+    $('meas').value = SAMPLE_CSV.replace('tiempo_s,voltaje_v\n', ''); readMeas();
+  });
+  $('clearExp').addEventListener('click', function () { $('csv').value = ''; $('meas').value = ''; readMeas(); });
+  if (window.ResizeObserver) { new ResizeObserver(function () { if (state.res) drawCharts(); }).observe($('plotV')); }
+  else { window.addEventListener('resize', function () { if (state.res) drawCharts(); }); }
+
+  setActive('base');
+  update();
+})();
+</script>
+</body>
+</html>
