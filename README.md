@@ -40,7 +40,7 @@ Una vez abierta la página:
 
 **Vista del circuito (el foco).** Entre la barra de reproducción y los indicadores hay un dibujo animado del circuito: el panel solar, el banco de capacitores (una celda por capacitor, con un nivel que sube y baja con el voltaje) y un **foco** que representa la luz de emergencia. El foco solo enciende durante el corte y mientras el voltaje del banco supere el mínimo; brilla más cuanto más voltaje tiene y se apaga cuando baja del mínimo. Los puntos que se mueven por los cables representan la corriente. Sirve para *ver* el efecto de cada cambio: por ejemplo, con el escenario «Banco de 5 F» el foco nunca enciende, y con «Carga completa» brilla y dura mucho más.
 
-**Ayuda con «!».** Junto a cada control, cada grupo y cada cuadro de resultados hay un pequeño botón «!». Al pulsarlo se despliega una explicación de **qué es ese dato y qué modifica si se sube o si se baja** (por ejemplo, qué pasa al subir o bajar el voltaje del panel, o al aumentar o disminuir la cantidad de capacitores).
+**Ayuda con «?».** Junto a cada control, cada grupo y cada cuadro de resultados hay un pequeño botón «?». Al pulsarlo se despliega una explicación de **qué es ese dato y qué modifica si se sube o si se baja** (por ejemplo, qué pasa al subir o bajar el voltaje del panel, o al aumentar o disminuir la cantidad de capacitores).
 
 **Panel con desplazamiento propio.** El panel izquierdo tiene su propia barra de desplazamiento: al recorrer los controles, los resultados de la derecha no se mueven.
 
@@ -89,12 +89,23 @@ El manual de usuario (PDF) explica cada gráfica con más detalle.
 
 ## 6. Escenarios de ejemplo incluidos
 
-| Botón | Descripción | Resultado principal |
+Once botones en el panel izquierdo cargan situaciones ya preparadas (después se pulsa «Iniciar simulación»):
+
+| Botón | Qué cambia respecto al Base | Qué se obtiene |
 |---|---|---|
-| **Base** | 3 capacitores de 1 F en paralelo; corte de 400 s a 900 s | Ceq = 3 F; 7.75 J al corte; autonomía teórica 699 s |
-| **Un capacitor** | Un solo capacitor de 1 F | Se carga más rápido: 8.77 J al corte; autonomía teórica 845 s |
-| **Banco de 5 F** | 5 capacitores de 1 F en paralelo | Con solo 400 s de carga llega a 1.52 V: autonomía 0 s |
-| **Carga completa** | 3 capacitores con 3300 s de carga | El banco se llena (4.97 V, 37 J); autonomía 3045 s (50.7 min) |
+| **Base** | Panel de 5 V, R = 220 Ω, RL = 1000 Ω, 3 capacitores de 1 F en paralelo, corte de 400 s a 900 s | Ceq = 3 F; 2.27 V y 7.75 J al corte; autonomía teórica 699 s |
+| **Un capacitor** | Un solo capacitor de 1 F | Se carga más rápido: 4.19 V y 8.77 J; autonomía teórica 845 s |
+| **Banco de 5 F** | 5 capacitores en paralelo | Con solo 400 s de carga llega a 1.52 V: autonomía 0 s (el foco no enciende) |
+| **Carga completa** | Duración 7000 s; corte de 3300 s a 7000 s | El banco se llena (4.97 V, 37 J); autonomía 3045 s (50.7 min) |
+| **Conexión en serie** | 3 capacitores en serie | Ceq = 0.333 F: se llena (4.98 V) pero guarda solo 4.13 J; autonomía 339 s |
+| **Conexión mixta** | 4 capacitores: 2 ramas en paralelo de 2 en serie | Ceq = 1 F: se comporta como un solo capacitor de 1 F |
+| **Panel de 3 V** | Voltaje del panel de 3 V | Llega a 1.36 V, por debajo del mínimo de 1.8 V: el foco nunca enciende |
+| **Panel de 9 V** | Voltaje del panel de 9 V | Llega a 4.09 V y guarda 25.10 J: el foco brilla mucho más; autonomía teórica 2463 s (verifique el voltaje máximo de cada capacitor real) |
+| **Carga lenta** | Resistencia de carga de 1000 Ω | Llega a solo 0.62 V (0.58 J): el foco no enciende |
+| **Luz de bajo consumo** | RL = 5000 Ω; duración 4000 s | Con la misma carga previa la luz dura 3497 s (58.3 min) en lugar de 699 s |
+| **Corte corto** | Corte de 400 s a 600 s; duración 1200 s | El foco enciende, se apaga al volver la energía y el panel recarga el banco |
+
+Para ver el efecto de **subir o bajar el voltaje del panel**, compare «Panel de 3 V», «Base» y «Panel de 9 V»; para ver el efecto de **la cantidad de capacitores**, compare «Un capacitor», «Base» y «Banco de 5 F».
 
 Conclusión de diseño que muestran los escenarios: **un banco más grande guarda más energía, pero tarda más en cargarse**; con poco tiempo de sol conviene un banco pequeño, con mucho tiempo uno grande.
 

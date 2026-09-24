@@ -186,6 +186,7 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
       <div class="rail-run">
         <div class="run-line" data-help="run"><button type="button" id="runBtn" class="primary big">Iniciar simulación</button></div>
         <p class="note" id="runHint">Elija un escenario o cambie valores y pulse el botón: verá correr la simulación segundo a segundo.</p>
+        <p class="cur-note" id="presetNote" role="status"></p>
       </div>
       <div class="rail-scroll" id="railScroll">
       <fieldset>
@@ -195,8 +196,15 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
           <button type="button" data-preset="uno" aria-pressed="false">Un capacitor</button>
           <button type="button" data-preset="grande" aria-pressed="false">Banco de 5 F</button>
           <button type="button" data-preset="completa" aria-pressed="false">Carga completa</button>
+          <button type="button" data-preset="serie" aria-pressed="false">Conexión en serie</button>
+          <button type="button" data-preset="mixto" aria-pressed="false">Conexión mixta</button>
+          <button type="button" data-preset="panel3" aria-pressed="false">Panel de 3 V</button>
+          <button type="button" data-preset="panel9" aria-pressed="false">Panel de 9 V</button>
+          <button type="button" data-preset="lenta" aria-pressed="false">Carga lenta</button>
+          <button type="button" data-preset="consumo" aria-pressed="false">Luz de bajo consumo</button>
+          <button type="button" data-preset="corto" aria-pressed="false">Corte corto</button>
         </div>
-        <p class="cur-note" id="presetNote" role="status"></p>
+
       </fieldset>
 
       <fieldset>
@@ -351,7 +359,14 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     base: preset({}),
     uno: preset({ n: 1 }),
     grande: preset({ n: 5 }),
-    completa: preset({ tt: 7000, tci: 3300, tcf: 7000, dt: 0.1 })
+    completa: preset({ tt: 7000, tci: 3300, tcf: 7000, dt: 0.1 }),
+    serie: preset({ arreglo: 'serie' }),
+    mixto: preset({ n: 4, arreglo: 'mixto' }),
+    panel3: preset({ vs: 3 }),
+    panel9: preset({ vs: 9 }),
+    lenta: preset({ r: 1000 }),
+    consumo: preset({ rl: 5000, tt: 4000, tcf: 4000, dt: 0.1 }),
+    corto: preset({ tt: 1200, tcf: 600 })
   };
   var FIELDS = ['vs', 'r', 'rl', 'c', 'n', 'arreglo', 'metodo', 'tt', 'tci', 'tcf', 'dt', 'vmin'];
   var TEXT_FIELDS = { arreglo: 1, metodo: 1 };
@@ -695,7 +710,7 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
       ['Qué hace', 'Ejecuta el escenario con los valores que hay en el panel y lo reproduce segundo a segundo: el banco se carga, llega el corte y la luz de emergencia se enciende o no.'],
       ['Importante', 'Cambiar casillas o elegir un escenario solo prepara los valores. El resultado cambia cuando usted pulsa este botón.']] },
     fPresets: { t: 'Escenarios de ejemplo', r: [
-      ['Qué son', 'Cuatro situaciones ya preparadas para comparar casos típicos sin escribir valores.'],
+      ['Qué son', 'Once situaciones ya preparadas para comparar casos típicos sin escribir valores: distintos bancos, conexiones, voltajes del panel, resistencias, consumos y cortes.'],
       ['Cómo se usan', 'Pulse uno para cargar sus valores y luego «Iniciar simulación». El botón azul es el elegido; si usted cambia una casilla pasa a «personalizado».']] },
     fFuente: { t: 'Fuente y resistencias', r: [['Qué agrupa', 'Los datos eléctricos del panel y de la luz: voltaje del panel, las dos resistencias y el voltaje mínimo con el que la luz funciona.']] },
     fBanco: { t: 'Banco de capacitores', r: [['Qué agrupa', 'El tamaño del banco: la capacitancia de cada capacitor, cuántos son y cómo se conectan. Define cuánta energía puede guardar.']] },
@@ -802,7 +817,7 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     var key = el.getAttribute('data-help'), h = HELP[key];
     if (!h) return;
     var btn = document.createElement('button');
-    btn.type = 'button'; btn.className = 'hbtn'; btn.textContent = '!';
+    btn.type = 'button'; btn.className = 'hbtn'; btn.textContent = '?';
     btn.setAttribute('aria-label', 'Qué hace: ' + h.t);
     btn.setAttribute('aria-expanded', 'false');
     var panel = document.createElement('div');
@@ -1022,8 +1037,16 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     base: 'Base — 3 capacitores de 1 F en paralelo; corte de 400 s a 900 s.',
     uno: 'Un capacitor — un solo capacitor de 1 F; se carga más rápido.',
     grande: 'Banco de 5 F — 5 capacitores de 1 F; guarda más energía, pero con solo 400 s de carga no alcanza el voltaje mínimo.',
-    completa: 'Carga completa — 3 capacitores con tiempo de sol suficiente (3300 s): el banco se llena y dura mucho más.'
+    completa: 'Carga completa — 3 capacitores con tiempo de sol suficiente (3300 s): el banco se llena y dura mucho más.',
+    serie: 'Conexión en serie — 3 capacitores de 1 F en serie (0.333 F en total): se cargan casi por completo en pocos minutos, pero guardan poca energía y la luz dura menos.',
+    mixto: 'Conexión mixta — 4 capacitores (2 ramas en paralelo de 2 en serie, 1 F en total): se comporta como un solo capacitor de 1 F.',
+    panel3: 'Panel de 3 V — con un panel de menos voltaje el banco no llega al mínimo de la luz (1.8 V) en 400 s: la luz nunca enciende.',
+    panel9: 'Panel de 9 V — con más voltaje el banco llega a 4.1 V y guarda 25 J: la luz brilla mucho más y dura mucho más (verifique el voltaje máximo que soporta cada capacitor real).',
+    lenta: 'Carga lenta — resistencia de carga de 1000 Ω en lugar de 220 Ω: en 400 s el banco llega a solo 0.6 V y la luz nunca enciende.',
+    consumo: 'Luz de bajo consumo — la luz consume poco (5000 Ω): con la misma carga previa dura casi una hora en lugar de 12 minutos.',
+    corto: 'Corte corto — el corte dura solo de 400 s a 600 s: la luz se enciende, se apaga cuando vuelve la energía y el panel recarga el banco.'
   };
+
   function setActive(key) {
     state.active = key;
     document.querySelectorAll('[data-preset]').forEach(function (b) {
@@ -1045,13 +1068,15 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     $('arrHint').textContent = ARR_HINT[$('arreglo').value];
   }
 
+
+  function loadPreset(key) { writeParams(PRESETS[key]); syncMixto(); setActive(key); markDirty(); }
+
   /* ---------- eventos ---------- */
   function onEdit() { syncMixto(); setActive(null); markDirty(); }
   FIELDS.forEach(function (k) { $(k).addEventListener('input', onEdit); $(k).addEventListener('change', onEdit); });
   document.querySelectorAll('[data-preset]').forEach(function (b) {
     b.addEventListener('click', function () {
-      var key = b.getAttribute('data-preset');
-      writeParams(PRESETS[key]); syncMixto(); setActive(key); markDirty();
+      loadPreset(b.getAttribute('data-preset'));
     });
   });
   $('meas').addEventListener('input', readMeas);
