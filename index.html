@@ -52,9 +52,27 @@ h1 { font-family: var(--serif); font-size: clamp(1.6rem, 3.4vw, 2.3rem); line-he
 .eyebrow { font-size: 12px; letter-spacing: .09em; text-transform: uppercase; font-weight: 700; color: var(--carga-ink); }
 
 .layout { display: grid; gap: 24px; grid-template-columns: 1fr; align-items: start; }
-@media (min-width: 940px) { .layout { grid-template-columns: 330px minmax(0, 1fr); } .rail { position: sticky; top: 16px; } }
+@media (min-width: 940px) {
+  .layout { grid-template-columns: 330px minmax(0, 1fr); }
+  .rail { position: sticky; top: 16px; max-height: calc(100vh - 32px); }
+  .rail-scroll { overflow-y: auto; overscroll-behavior: contain; min-height: 0; flex: 1 1 auto; }
+}
 
-.rail { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 18px; }
+.rail { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+.rail-run { padding: 14px 18px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; background: var(--surface); }
+.rail-scroll { padding: 18px; display: flex; flex-direction: column; gap: 18px; }
+button.big { width: 100%; padding: 12px 14px; font-size: 15px; font-weight: 700; border-radius: 8px; }
+button:disabled { opacity: .45; cursor: default; }
+button:disabled:hover { border-color: var(--line); }
+.playbar { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.play-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.sp { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.sp select { width: auto; padding: 5px 8px; font-size: 13px; }
+.ptext { font-family: var(--mono); font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; margin-left: auto; }
+.track { height: 6px; border-radius: 3px; background: var(--grid); overflow: hidden; }
+.fill { height: 100%; width: 100%; background: var(--desc); }
+.stale-note { margin: 0; padding: 8px 10px; border-radius: 6px; background: var(--warn-bg); color: var(--warn-ink); font-size: 13.5px; font-weight: 600; }
+.is-stale .kpis, .is-stale .valid, .is-stale .chart, .is-stale .readout { opacity: .45; }
 fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
 legend { padding: 0; margin-bottom: 8px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--muted); }
 .row { display: grid; grid-template-columns: 1fr 112px; gap: 10px; align-items: center; }
@@ -126,6 +144,26 @@ details p, details li { color: var(--muted); font-size: 14px; max-width: 78ch; }
 textarea { width: 100%; min-height: 96px; resize: vertical; font-family: var(--mono); font-size: 13px; color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
 .capt { margin: 0 0 6px; font-size: 13px; color: var(--muted); max-width: 80ch; }
 .kdesc { margin: 0; padding-left: 18px; }
+.hbtn { display: inline-flex; align-items: center; justify-content: center; width: 19px; height: 19px; margin-left: 6px; padding: 0; border-radius: 50%; border: 1.5px solid var(--desc); background: transparent; color: var(--desc-ink); font-size: 12px; font-weight: 800; line-height: 1; vertical-align: middle; cursor: pointer; flex: 0 0 auto; text-transform: none; letter-spacing: 0; }
+.hbtn:hover { background: var(--desc); color: #fff; }
+.hbtn[aria-expanded="true"] { background: var(--desc); color: #fff; }
+.help { background: var(--field); border: 1px solid var(--line); border-left: 3px solid var(--desc); border-radius: 6px; padding: 9px 11px; font-size: 13px; line-height: 1.45; color: var(--ink); text-transform: none; letter-spacing: 0; font-weight: 400; }
+.help p { margin: 0 0 5px; }
+.help p:last-child { margin-bottom: 0; }
+.help .ht { font-weight: 700; color: var(--desc-ink); }
+.run-line { display: flex; align-items: center; gap: 8px; }
+.run-line button.big { flex: 1 1 auto; width: auto; }
+.hostrow, .readout-row { display: flex; align-items: center; gap: 4px; }
+.valid-head { grid-column: 1 / -1; }
+.scene-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.scene-head h2 { font-size: 15px; margin: 0; font-weight: 700; display: flex; align-items: center; }
+#scene svg { display: block; width: 100%; max-width: 760px; height: auto; margin: 0 auto; }
+.scene-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 16px; border-top: 1px solid var(--line); padding-top: 10px; }
+@media (max-width: 640px) { .scene-stats { grid-template-columns: 1fr; } }
+.scene-stats .k { display: block; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.scene-stats .v { display: block; font-family: var(--serif); font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
+.scene-stats .s { display: block; font-size: 12.5px; color: var(--muted); }
+.is-stale .scene-card { opacity: .45; }
 footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
 </style>
 </head>
@@ -137,16 +175,21 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     <p class="lead">Un panel carga el banco durante el día; cuando hay un corte, el banco alimenta una carga (LED). Cambie los valores y observe cómo cambian el voltaje, la corriente y la energía.</p>
     <ol class="steps">
       <li>Elija un <b>escenario de ejemplo</b> (botones de la izquierda) o cambie los valores del circuito.</li>
-      <li>Lea los <b>cuatro indicadores</b>: cuánta energía guarda el banco y cuánto tiempo puede alimentar la carga.</li>
-      <li>Observe las <b>gráficas</b>: qué pasa con el voltaje, la corriente y la energía mientras hay sol y durante el corte.</li>
+      <li>Pulse <b>«Iniciar simulación»</b>: el escenario corre y las gráficas se dibujan segundo a segundo.</li>
+      <li>Lea los <b>cuatro indicadores</b> y observe las <b>gráficas</b>: voltaje, corriente y energía mientras hay sol y durante el corte.</li>
       <li>Opcional: si construyó el circuito, <b>compare con sus mediciones</b> (última sección de la izquierda).</li>
     </ol>
   </header>
 
   <div class="layout">
     <form class="rail" id="rail" onsubmit="return false" autocomplete="off">
+      <div class="rail-run">
+        <div class="run-line" data-help="run"><button type="button" id="runBtn" class="primary big">Iniciar simulación</button></div>
+        <p class="note" id="runHint">Elija un escenario o cambie valores y pulse el botón: verá correr la simulación segundo a segundo.</p>
+      </div>
+      <div class="rail-scroll" id="railScroll">
       <fieldset>
-        <legend>Escenarios de ejemplo</legend>
+        <legend data-help="fPresets">Escenarios de ejemplo</legend>
         <div class="presets">
           <button type="button" data-preset="base" aria-pressed="false">Base</button>
           <button type="button" data-preset="uno" aria-pressed="false">Un capacitor</button>
@@ -157,36 +200,37 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
       </fieldset>
 
       <fieldset>
-        <legend>Fuente y resistencias</legend>
-        <div class="row"><label for="vs">Voltaje del panel <span class="hint">V<sub>s</sub></span></label><div class="field"><input id="vs" type="number" step="any" min="0.1" value="5"><span class="unit">V</span></div></div>
-        <div class="row"><label for="r">Resistencia de carga <span class="hint">R, en serie con el panel</span></label><div class="field"><input id="r" type="number" step="any" min="0.1" value="220"><span class="unit">Ω</span></div></div>
-        <div class="row"><label for="rl">Resistencia de la carga <span class="hint">R<sub>L</sub> (LED)</span></label><div class="field"><input id="rl" type="number" step="any" min="0.1" value="1000"><span class="unit">Ω</span></div></div>
-        <div class="row"><label for="vmin">Voltaje mínimo útil <span class="hint">debajo, el LED no funciona</span></label><div class="field"><input id="vmin" type="number" step="any" min="0" value="1.8"><span class="unit">V</span></div></div>
+        <legend data-help="fFuente">Fuente y resistencias</legend>
+        <div class="row"><label for="vs" data-help="vs">Voltaje del panel <span class="hint">V<sub>s</sub></span></label><div class="field"><input id="vs" type="number" step="any" min="0.1" value="5"><span class="unit">V</span></div></div>
+        <div class="row"><label for="r" data-help="r">Resistencia de carga <span class="hint">R, en serie con el panel</span></label><div class="field"><input id="r" type="number" step="any" min="0.1" value="220"><span class="unit">Ω</span></div></div>
+        <div class="row"><label for="rl" data-help="rl">Resistencia de la carga <span class="hint">R<sub>L</sub> (LED)</span></label><div class="field"><input id="rl" type="number" step="any" min="0.1" value="1000"><span class="unit">Ω</span></div></div>
+        <div class="row"><label for="vmin" data-help="vmin">Voltaje mínimo útil <span class="hint">debajo, el LED no funciona</span></label><div class="field"><input id="vmin" type="number" step="any" min="0" value="1.8"><span class="unit">V</span></div></div>
       </fieldset>
 
       <fieldset>
-        <legend>Banco de capacitores</legend>
-        <div class="row"><label for="c">Capacitancia de cada uno <span class="hint">4700 µF = 0.0047 F</span></label><div class="field"><input id="c" type="number" step="any" min="0.000001" value="1"><span class="unit">F</span></div></div>
+        <legend data-help="fBanco">Banco de capacitores</legend>
+        <div class="row"><label for="c" data-help="c">Capacitancia de cada uno <span class="hint">4700 µF = 0.0047 F</span></label><div class="field"><input id="c" type="number" step="any" min="0.000001" value="1"><span class="unit">F</span></div></div>
         <div>
-          <label for="n" style="font-size:14px">Cantidad de capacitores</label>
+          <div class="hostrow"><label for="n" data-help="n" style="font-size:14px">Cantidad de capacitores</label></div>
           <div class="range-row"><input id="n" type="range" min="1" max="10" step="1" value="3"><output id="nOut" for="n">3</output></div>
         </div>
-        <div class="row"><label for="arreglo">Conexión</label><select id="arreglo"><option value="paralelo">Paralelo</option><option value="serie">Serie</option><option value="mixto">Mixto</option></select></div>
+        <div class="row"><label for="arreglo" data-help="arreglo">Conexión</label><select id="arreglo"><option value="paralelo">Paralelo</option><option value="serie">Serie</option><option value="mixto">Mixto</option></select></div>
+        <p class="note" id="arrHint"></p>
       </fieldset>
 
       <fieldset>
-        <legend>Escenario en el tiempo</legend>
-        <div class="row"><label for="tt">Duración simulada</label><div class="field"><input id="tt" type="number" step="any" min="1" value="900"><span class="unit">s</span></div></div>
-        <div class="row"><label for="tci">Inicio del corte</label><div class="field"><input id="tci" type="number" step="any" min="0" value="400"><span class="unit">s</span></div></div>
-        <div class="row"><label for="tcf">Fin del corte</label><div class="field"><input id="tcf" type="number" step="any" min="0" value="900"><span class="unit">s</span></div></div>
-        <div class="row"><label for="metodo">Método numérico</label><select id="metodo"><option value="rk4">Runge-Kutta 4</option><option value="euler">Euler</option></select></div>
-        <div class="row"><label for="dt">Paso de cálculo <span class="hint">más chico = más lento</span></label><div class="field"><input id="dt" type="number" step="any" min="0.001" value="0.05"><span class="unit">s</span></div></div>
+        <legend data-help="fTiempo">Escenario en el tiempo</legend>
+        <div class="row"><label for="tt" data-help="tt">Duración simulada</label><div class="field"><input id="tt" type="number" step="any" min="1" value="900"><span class="unit">s</span></div></div>
+        <div class="row"><label for="tci" data-help="tci">Inicio del corte</label><div class="field"><input id="tci" type="number" step="any" min="0" value="400"><span class="unit">s</span></div></div>
+        <div class="row"><label for="tcf" data-help="tcf">Fin del corte</label><div class="field"><input id="tcf" type="number" step="any" min="0" value="900"><span class="unit">s</span></div></div>
+        <div class="row"><label for="metodo" data-help="metodo">Método numérico</label><select id="metodo"><option value="rk4">Runge-Kutta 4</option><option value="euler">Euler</option></select></div>
+        <div class="row"><label for="dt" data-help="dt">Paso de cálculo <span class="hint">más chico = más lento</span></label><div class="field"><input id="dt" type="number" step="any" min="0.001" value="0.05"><span class="unit">s</span></div></div>
       </fieldset>
 
       <fieldset>
-        <legend>Sus mediciones (opcional)</legend>
+        <legend data-help="fMeds">Sus mediciones (opcional)</legend>
         <p class="note">Solo si construyó el circuito y midió el voltaje del capacitor con un multímetro. Escriba abajo lo que midió, una línea por medición: <b>tiempo en segundos</b>, un espacio o coma, y <b>voltaje en voltios</b>. Los puntos aparecen en la gráfica de voltaje y se calcula el error. Si no tiene mediciones, ignore esta sección.</p>
-        <label for="meas" style="font-size:14px">Sus mediciones</label>
+        <div class="hostrow"><label for="meas" data-help="meas" style="font-size:14px">Sus mediciones</label></div>
         <textarea id="meas" spellcheck="false" placeholder="0, 0.02&#10;20, 0.55&#10;40, 0.98&#10;(tiempo en s, voltaje en V; use punto decimal)"></textarea>
         <p class="note" id="measStatus">Sin mediciones (opcional).</p>
         <div class="presets">
@@ -200,19 +244,45 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
         </details>
         <p class="note">El ejemplo son datos sintéticos: sirven solo para ver cómo funciona.</p>
       </fieldset>
+      </div>
     </form>
 
-    <main class="results">
+    <main class="results" id="results">
       <div id="msg" class="msg" role="alert" hidden></div>
 
+      <section class="playbar" id="playbar" aria-label="Reproducción de la simulación">
+        <div class="play-row" data-help="play">
+          <button type="button" id="pauseBtn" disabled>Pausar</button>
+          <button type="button" id="skipBtn" disabled>Ver resultado final</button>
+          <label class="sp" for="speed">Velocidad
+            <select id="speed"><option value="0.5">Lenta</option><option value="1" selected>Normal</option><option value="2">Rápida</option><option value="4">Muy rápida</option></select>
+          </label>
+          <span class="ptext" id="playText"></span>
+        </div>
+        <div class="track"><div class="fill" id="fill"></div></div>
+        <p class="stale-note" id="staleNote" hidden>Cambió el escenario: pulse «Iniciar simulación» para ver su resultado. Abajo sigue el resultado anterior.</p>
+      </section>
+
+      <section class="scene-card" id="sceneCard" aria-label="Vista del circuito">
+        <div class="scene-head"><h2 data-help="scene">Vista del circuito</h2></div>
+        <p class="capt">Así se ve el circuito mientras corre la simulación: el banco se llena con el sol y, cuando se va la luz, alimenta el foco. Cambie un valor y compare cómo se comporta el foco.</p>
+        <div id="scene"></div>
+        <div class="scene-stats">
+          <div><span class="k">Panel solar</span><span class="v" id="sPanel">—</span><span class="s" id="sPanelS"></span></div>
+          <div><span class="k">Banco de capacitores</span><span class="v" id="sBank">—</span><span class="s" id="sBankS"></span></div>
+          <div><span class="k">Luz de emergencia</span><span class="v" id="sBulb">—</span><span class="s" id="sBulbS"></span></div>
+        </div>
+      </section>
+
       <section class="kpis" aria-label="Resultados principales">
-        <div class="kpi"><span class="k">Capacitancia equivalente</span><span class="v" id="kCeq">—</span><span class="s" id="kCeqS"></span></div>
-        <div class="kpi"><span class="k">Constante de tiempo</span><span class="v" id="kTau">—</span><span class="s" id="kTauS"></span></div>
-        <div class="kpi"><span class="k">Energía al iniciar el corte</span><span class="v" id="kE">—</span><span class="s" id="kES"></span></div>
-        <div class="kpi"><span class="k">Autonomía útil</span><span class="v" id="kAut">—</span><span class="s" id="kAutS"></span><span class="chip" id="kAutChip" hidden></span></div>
+        <div class="kpi"><span class="k" data-help="kCeq">Capacitancia equivalente</span><span class="v" id="kCeq">—</span><span class="s" id="kCeqS"></span></div>
+        <div class="kpi"><span class="k" data-help="kTau">Constante de tiempo</span><span class="v" id="kTau">—</span><span class="s" id="kTauS"></span></div>
+        <div class="kpi"><span class="k" data-help="kE">Energía al iniciar el corte</span><span class="v" id="kE">—</span><span class="s" id="kES"></span></div>
+        <div class="kpi"><span class="k" data-help="kAut">Autonomía útil</span><span class="v" id="kAut">—</span><span class="s" id="kAutS"></span><span class="chip" id="kAutChip" hidden></span></div>
       </section>
 
       <section class="valid" id="valid" aria-label="Comparación con mediciones" hidden>
+        <div class="valid-head"><span class="k" data-help="valid">Comparación con mediciones</span></div>
         <div><div class="k">Puntos medidos</div><div class="v" id="vN">0</div></div>
         <div><div class="k">Error relativo medio</div><div class="v" id="vMean">—</div></div>
         <div><div class="k">Error relativo máximo</div><div class="v" id="vMax">—</div></div>
@@ -221,7 +291,7 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
       </section>
 
       <section class="chart">
-        <div class="chart-head"><h2>Voltaje del banco</h2>
+        <div class="chart-head"><h2 data-help="gV">Voltaje del banco</h2>
           <div class="legend">
             <span><i class="sw" style="border-color:var(--carga)"></i>Simulado · carga</span>
             <span><i class="sw" style="border-color:var(--desc)"></i>Simulado · corte</span>
@@ -234,16 +304,16 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
         <div class="plot" id="plotV"></div>
       </section>
       <section class="chart">
-        <div class="chart-head"><h2>Corriente del circuito</h2></div>
+        <div class="chart-head"><h2 data-help="gI">Corriente del circuito</h2></div>
         <p class="capt">Cuánta corriente circula por el circuito. Es grande al empezar cada fase y disminuye; salta al iniciar el corte porque la corriente pasa a circular por la carga.</p>
         <div class="plot" id="plotI"></div>
       </section>
       <section class="chart">
-        <div class="chart-head"><h2>Energía almacenada</h2></div>
+        <div class="chart-head"><h2 data-help="gE">Energía almacenada</h2></div>
         <p class="capt">Energía guardada en el banco (E = ½·C·V²). Crece durante la carga y se gasta durante el corte.</p>
         <div class="plot" id="plotE"></div>
       </section>
-      <div class="readout" id="readout" aria-live="off">Pase el cursor (o el dedo) sobre las gráficas para leer valores.</div>
+      <div class="readout-row"><div class="readout" id="readout" aria-live="off">Pase el cursor (o el dedo) sobre las gráficas para leer valores.</div><span data-help="readout"></span></div>
 
       <details>
         <summary>Qué significa cada dato y cómo leer las gráficas</summary>
@@ -286,7 +356,7 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
   var FIELDS = ['vs', 'r', 'rl', 'c', 'n', 'arreglo', 'metodo', 'tt', 'tci', 'tcf', 'dt', 'vmin'];
   var TEXT_FIELDS = { arreglo: 1, metodo: 1 };
 
-  var state = { res: null, p: null, exp: null, expName: '', cursorT: null, idx: [], layout: null, active: 'base' };
+  var state = { res: null, p: null, exp: null, expName: '', cursorT: null, idx: [], layout: null, active: 'base', prog: 1, imax: 1, mode: 'idle', timer: null, last: 0, speed: 1, dirty: false, hover: false };
 
   /* ---------- física ---------- */
   function ceqOf(c, n, arreglo) {
@@ -369,8 +439,14 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     return p;
   }
   function writeParams(p) {
+    $('arreglo').value = p.arreglo;
+    setNConstraints();
     FIELDS.forEach(function (k) { $(k).value = p[k]; });
     $('nOut').textContent = p.n;
+  }
+  function setNConstraints() {
+    var n = $('n');
+    if ($('arreglo').value === 'mixto') { n.min = 2; n.step = 2; } else { n.step = 1; n.min = 1; }
   }
   function validate(p) {
     var need = ['vs', 'r', 'rl', 'c', 'dt', 'tt'];
@@ -437,11 +513,13 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
       out += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + sy(hl.y).toFixed(1) + '" y2="' + sy(hl.y).toFixed(1) + '" stroke="var(--carga-ink)" stroke-width="1.2" stroke-dasharray="2 4"/>' +
         '<text x="' + (L + 6) + '" y="' + (sy(hl.y) - 5).toFixed(1) + '" style="fill:var(--carga-ink)">' + hl.label + '</text>';
     });
+    out += '<defs><clipPath id="clip-' + spec.id + '"><rect data-clip x="' + (L - 2) + '" y="0" width="' + pw + '" height="' + H + '"/></clipPath></defs><g clip-path="url(#clip-' + spec.id + ')">';
     spec.series.forEach(function (s) {
       if (s.xs.length < 2) return;
       out += '<path d="' + pathOf(s.xs, s.ys, sx, sy) + '" fill="none" stroke="' + s.color + '" stroke-width="' + (s.w || 2) + '"' +
         (s.dash ? ' stroke-dasharray="6 5"' : '') + ' stroke-linejoin="round" stroke-linecap="round"/>';
     });
+    out += '</g>';
     (spec.points || []).forEach(function (pt) {
       if (pt[0] > spec.xMax || pt[1] > yTop) return;
       out += '<circle cx="' + sx(pt[0]).toFixed(1) + '" cy="' + sy(pt[1]).toFixed(1) + '" r="3.2" fill="var(--exp)"/>';
@@ -501,21 +579,22 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     var band = [p.tci, p.tcf];
 
     var cv = buildChart({
-      W: W, H: H, xMax: p.tt, yMax: maxV * 1.06, yLabel: 'Vc [V]', label: 'Voltaje del banco de capacitores en el tiempo',
+      id: 'V', W: W, H: H, xMax: p.tt, yMax: maxV * 1.06, yLabel: 'Vc [V]', label: 'Voltaje del banco de capacitores en el tiempo',
       band: band, hlines: [{ y: p.vmin, label: 'V mín ' + fmt(p.vmin) + ' V' }],
       series: analyticSeries(p, res).concat(coloredSeries(res, res.vc, idx, 1)), points: expPts.filter(function (q) { return q[0] <= p.tt; })
     });
     var ci = buildChart({
-      W: W, H: H, xMax: p.tt, yMax: Math.max(maxI * iScale, 1e-9) * 1.06, yLabel: 'I [' + iUnit + ']', label: 'Corriente del circuito en el tiempo',
+      id: 'I', W: W, H: H, xMax: p.tt, yMax: Math.max(maxI * iScale, 1e-9) * 1.06, yLabel: 'I [' + iUnit + ']', label: 'Corriente del circuito en el tiempo',
       band: band, series: coloredSeries(res, res.i, idx, iScale)
     });
     var ce = buildChart({
-      W: W, H: H, xMax: p.tt, yMax: Math.max(maxE, 1e-9) * 1.06, yLabel: 'E [J]', label: 'Energía almacenada en el banco de capacitores en el tiempo',
+      id: 'E', W: W, H: H, xMax: p.tt, yMax: Math.max(maxE, 1e-9) * 1.06, yLabel: 'E [J]', label: 'Energía almacenada en el banco de capacitores en el tiempo',
       band: band, series: coloredSeries(res, res.e, idx, 1)
     });
     $('plotV').innerHTML = cv.html; $('plotI').innerHTML = ci.html; $('plotE').innerHTML = ce.html;
     state.layout = { W: W, L: cv.L, pw: cv.pw, iScale: iScale, iUnit: iUnit };
     bindCursor();
+    setClip(state.prog);
     if (state.cursorT != null) setCursor(state.cursorT);
   }
 
@@ -531,14 +610,15 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
         fr = Math.min(1, Math.max(0, fr));
         setCursor(fr * state.p.tt);
       }
-      hit.addEventListener('pointermove', move);
-      hit.addEventListener('pointerdown', move);
-      hit.addEventListener('pointerleave', function () { state.cursorT = null; hideCursor(); });
+      hit.addEventListener('pointermove', function (ev) { state.hover = true; move(ev); });
+      hit.addEventListener('pointerdown', function (ev) { state.hover = true; move(ev); });
+      hit.addEventListener('pointerleave', function () { state.hover = false; state.cursorT = null; if (state.mode === 'idle') hideCursor(); });
     });
   }
   function hideCursor() {
     document.querySelectorAll('[data-cur]').forEach(function (l) { l.setAttribute('x1', -10); l.setAttribute('x2', -10); });
     $('readout').textContent = 'Pase el cursor (o el dedo) sobre las gráficas para leer valores.';
+    if (state.res && state.mode === 'idle') updateScene(state.p.tt, false);
   }
   function setCursor(t) {
     var res = state.res, p = state.p, ly = state.layout;
@@ -546,6 +626,7 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     state.cursorT = t;
     var x = ly.L + t / p.tt * ly.pw;
     document.querySelectorAll('[data-cur]').forEach(function (l) { l.setAttribute('x1', x.toFixed(1)); l.setAttribute('x2', x.toFixed(1)); });
+    if (state.mode !== 'playing') updateScene(t, false);
     var k = Math.min(res.N - 1, Math.max(0, Math.round(t / res.h)));
     $('readout').textContent = 't = ' + fmt(res.t[k], res.t[k] >= 100 ? 0 : 1) + ' s · ' + (res.cut[k] ? 'corte' : 'carga') +
       ' · Vc = ' + fmt(res.vc[k], 3) + ' V · I = ' + fmt(res.i[k] * ly.iScale, 2) + ' ' + ly.iUnit + ' · E = ' + fmt(res.e[k], 2) + ' J';
@@ -608,20 +689,310 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
       'El error relativo se dispara donde el voltaje es muy pequeño (al inicio de la carga); revise también el error absoluto. Use en los parámetros los valores medidos de R, C y Vs.';
   }
 
-  var scheduled = false;
-  function schedule() { if (scheduled) return; scheduled = true; requestAnimationFrame(function () { scheduled = false; update(); }); }
-  function update() {
-    var p = readParams();
-    $('nOut').textContent = isFinite(p.n) ? p.n : '';
-    var bad = validate(p);
-    if (bad) { showMsg(bad); return; }
-    try {
-      var res = simulate(p);
-      showMsg('');
-      state.p = p; state.res = res; state.idx = sampleIdx(res.N);
-      renderKpis(); renderValidation(); drawCharts();
-    } catch (e) { showMsg(e.message); }
+  /* ---------- ayuda «!» ---------- */
+  var HELP = {
+    run: { t: 'Iniciar simulación', r: [
+      ['Qué hace', 'Ejecuta el escenario con los valores que hay en el panel y lo reproduce segundo a segundo: el banco se carga, llega el corte y la luz de emergencia se enciende o no.'],
+      ['Importante', 'Cambiar casillas o elegir un escenario solo prepara los valores. El resultado cambia cuando usted pulsa este botón.']] },
+    fPresets: { t: 'Escenarios de ejemplo', r: [
+      ['Qué son', 'Cuatro situaciones ya preparadas para comparar casos típicos sin escribir valores.'],
+      ['Cómo se usan', 'Pulse uno para cargar sus valores y luego «Iniciar simulación». El botón azul es el elegido; si usted cambia una casilla pasa a «personalizado».']] },
+    fFuente: { t: 'Fuente y resistencias', r: [['Qué agrupa', 'Los datos eléctricos del panel y de la luz: voltaje del panel, las dos resistencias y el voltaje mínimo con el que la luz funciona.']] },
+    fBanco: { t: 'Banco de capacitores', r: [['Qué agrupa', 'El tamaño del banco: la capacitancia de cada capacitor, cuántos son y cómo se conectan. Define cuánta energía puede guardar.']] },
+    fTiempo: { t: 'Escenario en el tiempo', r: [['Qué agrupa', 'Cuándo se va y vuelve la luz, cuántos segundos se simulan y cómo se hace el cálculo.']] },
+    fMeds: { t: 'Sus mediciones', r: [
+      ['Qué es', 'Sección opcional para comparar la simulación con mediciones reales de laboratorio. No hace falta subir ningún archivo: se escriben en el cuadro.'],
+      ['Botones', '«Ver un ejemplo» escribe datos sintéticos y ejecuta el escenario Base para mostrar cómo funciona; «Borrar mediciones» vacía el cuadro.']] },
+    vs: { t: 'Voltaje del panel', r: [
+      ['Qué es', 'El voltaje que entrega el panel solar mientras hay sol. Es la «meta» del banco: mientras hay sol, el banco se llena hacia ese voltaje y nunca lo supera.'],
+      ['Si lo sube', 'El banco llega a más voltaje y guarda más energía (la energía crece con el cuadrado del voltaje: al doble de voltios, cuatro veces más). La luz brilla más y dura más. También sube la corriente inicial de carga.'],
+      ['Si lo baja', 'El banco llega a menos voltaje y guarda menos energía: la luz brilla menos y dura menos. Si baja hasta el voltaje mínimo de la luz o menos, la luz nunca enciende.']] },
+    r: { t: 'Resistencia de carga', r: [
+      ['Qué es', 'La resistencia del camino entre el panel y el banco. Es como una manguera: cuanto mayor, menos corriente pasa.'],
+      ['Si la sube', 'El banco se carga más lento: con el mismo tiempo de sol llega menos cargado al corte, así que la luz brilla menos y dura menos. La corriente inicial es menor.'],
+      ['Si la baja', 'El banco se carga más rápido y llega más cargado al corte. La corriente inicial es mayor (un panel pequeño podría no soportarla).']] },
+    rl: { t: 'Resistencia de la carga', r: [
+      ['Qué es', 'Cuánto consume la luz de emergencia, expresado como resistencia (un LED de 3 V y 3 mA equivale a unos 1000 Ω).'],
+      ['Si la sube', 'La luz consume menos corriente: el banco se descarga más despacio y la luz dura más tiempo (la autonomía es proporcional a esta resistencia).'],
+      ['Si la baja', 'La luz consume más: el banco se vacía más rápido y la autonomía baja.']] },
+    vmin: { t: 'Voltaje mínimo útil', r: [
+      ['Qué es', 'El voltaje mínimo con el que la luz todavía funciona. Debajo de él se apaga. No cambia el circuito: solo decide cuándo se declara apagada la luz (línea punteada en la gráfica y en el banco).'],
+      ['Si lo sube', 'Se exige más voltaje: la luz se apaga antes, la autonomía baja y puede no encender nunca.'],
+      ['Si lo baja', 'La luz sigue encendida más tiempo aunque el banco esté casi vacío: la autonomía aumenta.']] },
+    c: { t: 'Capacitancia de cada capacitor', r: [
+      ['Qué es', 'La capacidad de cada capacitor para guardar carga, en faradios (1 F = 1 000 000 µF).'],
+      ['Si la sube', 'El banco guarda más energía, pero se carga y se descarga más lento.'],
+      ['Si la baja', 'El banco se llena rápido pero guarda poca energía: la luz dura poco.']] },
+    n: { t: 'Cantidad de capacitores', r: [
+      ['Qué es', 'Cuántos capacitores iguales forman el banco (se dibujan como celdas en la vista del circuito).'],
+      ['Si la sube', 'En paralelo: más capacitancia total, o sea más energía pero carga más lenta (con poco tiempo de sol puede no alcanzar el voltaje mínimo). En serie o mixto: menos capacitancia total, se carga más rápido pero guarda menos.'],
+      ['Si la baja', 'Lo contrario: en paralelo el banco es más chico y se llena antes; en serie o mixto la capacitancia total sube.'],
+      ['Ejemplo', 'Con 1 F cada uno y 400 s de sol: 1 capacitor llega a 4.19 V y la luz enciende; 5 en paralelo llegan a solo 1.52 V y la luz no enciende.']] },
+    arreglo: { t: 'Conexión', r: [
+      ['Qué es', 'Cómo se conectan entre sí los capacitores del banco.'],
+      ['Paralelo', 'Lado a lado: las capacidades se suman (Ceq = n·C). Guarda más energía.'],
+      ['Serie', 'Uno tras otro: la capacidad total baja (Ceq = C/n). Cada capacitor soporta parte del voltaje.'],
+      ['Mixto', 'Dos ramas iguales en paralelo, cada una con n/2 en serie (Ceq = 4·C/n). Exige cantidad par.']] },
+    tt: { t: 'Duración simulada', r: [
+      ['Qué es', 'Cuántos segundos se calculan y se dibujan, desde el segundo 0.'],
+      ['Si la sube', 'Se ve más tiempo del proceso, por ejemplo toda la descarga.'],
+      ['Si la baja', 'Se ve menos; si es menor que el fin del corte, el corte queda recortado.']] },
+    tci: { t: 'Inicio del corte', r: [
+      ['Qué es', 'El segundo en que se va la luz. Es también el tiempo que el panel tuvo para cargar el banco.'],
+      ['Si lo sube', 'El banco llega más cargado al corte: más energía, luz más brillante y más duradera.'],
+      ['Si lo baja', 'El banco llega menos cargado: la luz brilla menos, dura menos y puede no encender.']] },
+    tcf: { t: 'Fin del corte', r: [
+      ['Qué es', 'El segundo en que vuelve la energía.'],
+      ['Si lo sube', 'El corte dura más y se puede observar más tiempo de luz.'],
+      ['Si lo baja', 'El corte es más corto. Si es menor que la duración, al volver la energía el panel recarga el banco y la luz se apaga.']] },
+    metodo: { t: 'Método numérico', r: [['Qué es', 'La forma en que el programa calcula las curvas. Runge-Kutta 4 es más preciso; Euler es más simple. En este circuito los resultados son casi idénticos: cambiarlo no cambia la física.']] },
+    dt: { t: 'Paso de cálculo', r: [
+      ['Qué es', 'Cada cuántos segundos se calcula un punto.'],
+      ['Si lo sube', 'El cálculo es más rápido pero menos preciso.'],
+      ['Si lo baja', 'Más preciso pero más lento; con duraciones largas puede aparecer el aviso «demasiados puntos».']] },
+    meas: { t: 'Sus mediciones', r: [
+      ['Qué es', 'Los voltajes que usted midió en el capacitor con un multímetro. Escriba una medición por línea: tiempo en segundos, un espacio o coma, y voltaje en voltios (con punto decimal).'],
+      ['Qué hace', 'Se dibujan como puntos negros en la gráfica de voltaje y se calcula el error contra la simulación. Es opcional.']] },
+    play: { t: 'Reproducción', r: [
+      ['Qué es', 'Los controles de la animación del escenario.'],
+      ['Pausar / Continuar', 'Detiene la animación en el instante actual y la reanuda.'],
+      ['Ver resultado final', 'Salta al final y muestra las curvas completas.'],
+      ['Velocidad', 'Lenta 16 s, normal 8 s, rápida 4 s o muy rápida 2 s para recorrer todo el escenario.'],
+      ['Reloj', 'El segundo simulado en que va y la fase: carga (hay sol) o corte.']] },
+    scene: { t: 'Vista del circuito', r: [
+      ['Qué muestra', 'El circuito en acción: panel solar, banco de capacitores y luz de emergencia, en el instante que corre la simulación.'],
+      ['Nivel del banco', 'Cuánto voltaje tiene el banco respecto al del panel. La línea punteada es el voltaje mínimo de la luz. Cada celda es un capacitor.'],
+      ['Puntos que se mueven', 'Es la corriente: se mueven más rápido cuanto mayor es la corriente. Van por el cable del panel durante la carga y por el de la luz durante el corte.'],
+      ['El foco', 'Solo enciende durante el corte y mientras el banco tenga más voltaje que el mínimo; brilla más cuanto más voltaje tiene.']] },
+    kCeq: { t: 'Capacitancia equivalente', r: [
+      ['Qué es', 'La capacidad total del banco, como si todos los capacitores fueran uno solo.'],
+      ['Si sube', 'El banco guarda más energía, pero se carga y se descarga más lento.'],
+      ['Si baja', 'Guarda menos energía y se llena más rápido.']] },
+    kTau: { t: 'Constante de tiempo', r: [
+      ['Qué es', 'La «velocidad» del circuito: en un tiempo τ el banco se carga el 63 % y se llena en unas 5τ.'],
+      ['Si sube', 'Todo es más lento: el banco tarda más en llenarse y en vaciarse.'],
+      ['Si baja', 'Todo es más rápido.']] },
+    kE: { t: 'Energía al iniciar el corte', r: [
+      ['Qué es', 'La energía que tiene guardada el banco justo cuando se va la luz: su reserva.'],
+      ['Si sube', 'Hay más reserva para la luz: brilla más y dura más.'],
+      ['Si baja', 'Hay menos reserva: la luz brilla menos y dura menos.']] },
+    kAut: { t: 'Autonomía útil', r: [
+      ['Qué es', 'Cuánto tiempo mantiene encendida la luz durante el corte, hasta que el voltaje del banco baja del mínimo.'],
+      ['Si sube', 'El diseño sostiene la luz por más tiempo.'],
+      ['Si baja o es 0', 'La luz dura poco o nunca enciende: falta carga previa, capacidad o resistencia de carga.']] },
+    valid: { t: 'Comparación con mediciones', r: [
+      ['Qué es', 'Cuánto se parecen sus mediciones a la simulación. Solo aparece si escribió mediciones.'],
+      ['Errores', 'El error relativo se da en porcentaje y el absoluto en voltios. Cuanto menores, mejor coincide el modelo con el circuito real.']] },
+    gV: { t: 'Voltaje del banco', r: [
+      ['Qué muestra', 'El voltaje del banco de capacitores en cada segundo.'],
+      ['Si la curva sube', 'El banco se está cargando (hay sol). Sube cada vez más despacio al acercarse al voltaje del panel.'],
+      ['Si la curva baja', 'El banco se descarga alimentando la luz. Si cruza la línea punteada, la luz se apaga.']] },
+    gI: { t: 'Corriente del circuito', r: [
+      ['Qué muestra', 'La corriente que circula en cada segundo.'],
+      ['Si la curva baja', 'Cada vez hay menos diferencia de voltaje que empuje la corriente (en la carga) o el banco tiene menos voltaje (en el corte).'],
+      ['Si da un salto', 'Cambió la fase (inicio o fin del corte): la corriente pasa a circular por otra resistencia.']] },
+    gE: { t: 'Energía almacenada', r: [
+      ['Qué muestra', 'La energía guardada en el banco en cada segundo.'],
+      ['Si la curva sube', 'El banco acumula energía. Crece lento al principio porque la energía depende del cuadrado del voltaje.'],
+      ['Si la curva baja', 'La luz consume la energía guardada.']] },
+    readout: { t: 'Línea de lectura', r: [['Qué es', 'Al pasar el cursor (o el dedo) sobre una gráfica muestra el segundo, la fase, el voltaje, la corriente y la energía de ese instante, y mueve el foco y el banco de la vista del circuito a ese momento.']] }
+  };
+
+  function attachHelp(el) {
+    var key = el.getAttribute('data-help'), h = HELP[key];
+    if (!h) return;
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'hbtn'; btn.textContent = '!';
+    btn.setAttribute('aria-label', 'Qué hace: ' + h.t);
+    btn.setAttribute('aria-expanded', 'false');
+    var panel = document.createElement('div');
+    panel.className = 'help'; panel.hidden = true; panel.id = 'help-' + key;
+    var html = '<p class="ht">' + h.t + '</p>';
+    h.r.forEach(function (row) { html += '<p><b>' + row[0] + ':</b> ' + row[1] + '</p>'; });
+    panel.innerHTML = html;
+    btn.setAttribute('aria-controls', panel.id);
+    btn.addEventListener('click', function (ev) {
+      ev.preventDefault(); ev.stopPropagation();
+      var open = panel.hidden;
+      panel.hidden = !open;
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    var hint = el.querySelector('.hint');
+    if (hint) el.insertBefore(btn, hint); else el.appendChild(btn);
+    var host = el.closest('.row, .hostrow, .chart-head, legend, .run-line, .play-row, .scene-head, .valid-head, .kpi, .readout-row');
+    if (host && host.classList.contains('kpi')) host.appendChild(panel);
+    else if (host) host.insertAdjacentElement('afterend', panel);
+    else el.insertAdjacentElement('afterend', panel);
   }
+
+  /* ---------- vista del circuito ---------- */
+  var SC = { ready: false, tankTop: 46, tankH: 128, tankX: 278, tankW: 144 };
+  function svgEl(tag, attrs) {
+    var e = document.createElementNS('http://www.w3.org/2000/svg', tag), k;
+    for (k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function buildScene() {
+    var p = state.p, host = $('scene'), n = p.n, i;
+    var svg = '<svg viewBox="0 0 720 200" role="img" aria-label="Circuito: panel solar, banco de capacitores y luz de emergencia">' +
+      '<defs><radialGradient id="glow"><stop offset="0" stop-color="#FFE28A" stop-opacity="0.95"/><stop offset="1" stop-color="#FFC83D" stop-opacity="0"/></radialGradient></defs>';
+    // panel solar
+    svg += '<g data-sc="panel">';
+    for (i = 0; i < 8; i++) {
+      var a = i * Math.PI / 4;
+      svg += '<line data-sc="sunray" x1="' + (62 + Math.cos(a) * 24).toFixed(1) + '" y1="' + (40 + Math.sin(a) * 24).toFixed(1) + '" x2="' + (62 + Math.cos(a) * 34).toFixed(1) + '" y2="' + (40 + Math.sin(a) * 34).toFixed(1) + '" stroke="#F2B04A" stroke-width="3" stroke-linecap="round"/>';
+    }
+    svg += '<circle cx="62" cy="40" r="16" fill="#F2B04A"/>' +
+      '<polygon points="30,86 122,86 108,138 16,138" style="fill:var(--desc)" stroke="var(--ink)" stroke-width="2"/>' +
+      '<line x1="53" y1="86" x2="39" y2="138" stroke="#fff" stroke-opacity=".55"/><line x1="76" y1="86" x2="62" y2="138" stroke="#fff" stroke-opacity=".55"/><line x1="99" y1="86" x2="85" y2="138" stroke="#fff" stroke-opacity=".55"/>' +
+      '<line x1="23" y1="112" x2="115" y2="112" stroke="#fff" stroke-opacity=".55"/>' +
+      '<line x1="62" y1="138" x2="62" y2="158" stroke="var(--ink)" stroke-width="3"/><line x1="40" y1="158" x2="84" y2="158" stroke="var(--ink)" stroke-width="3"/></g>';
+    // cables
+    svg += '<path d="M118 112 H272" fill="none" stroke="var(--line)" stroke-width="7" stroke-linecap="round"/>' +
+      '<path data-sc="flow1" d="M118 112 H272" fill="none" style="stroke:var(--carga)" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 14"/>' +
+      '<path d="M428 112 H530 V150 H604" fill="none" stroke="var(--line)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path data-sc="flow2" d="M428 112 H530 V150 H604" fill="none" style="stroke:var(--desc)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 14"/>';
+    // banco: celdas
+    var gap = 4, cw = (SC.tankW - (n - 1) * gap) / n;
+    svg += '<rect x="272" y="40" width="156" height="140" rx="10" style="fill:var(--surface)" stroke="var(--ink)" stroke-width="2.5"/>';
+    for (i = 0; i < n; i++) {
+      var cx = SC.tankX + i * (cw + gap);
+      svg += '<rect x="' + cx.toFixed(1) + '" y="' + SC.tankTop + '" width="' + cw.toFixed(1) + '" height="' + SC.tankH + '" rx="3" style="fill:var(--field)"/>' +
+        '<rect data-sc="fill" x="' + cx.toFixed(1) + '" y="' + (SC.tankTop + SC.tankH) + '" width="' + cw.toFixed(1) + '" height="0" rx="3" style="fill:var(--carga)"/>';
+    }
+    var vy = SC.tankTop + SC.tankH * (1 - Math.min(1, p.vmin / p.vs));
+    svg += '<line x1="272" x2="428" y1="' + vy.toFixed(1) + '" y2="' + vy.toFixed(1) + '" style="stroke:var(--ink)" stroke-width="1.6" stroke-dasharray="5 4"/>';
+    // foco
+    svg += '<circle data-sc="glow" cx="640" cy="112" r="88" fill="url(#glow)" opacity="0"/>';
+    for (i = 0; i < 10; i++) {
+      var b = -Math.PI + i * Math.PI / 9;
+      svg += '<line data-sc="ray" data-a="' + b.toFixed(3) + '" x1="' + (640 + Math.cos(b) * 50).toFixed(1) + '" y1="' + (108 + Math.sin(b) * 50).toFixed(1) + '" x2="' + (640 + Math.cos(b) * 50).toFixed(1) + '" y2="' + (108 + Math.sin(b) * 50).toFixed(1) + '" stroke="#FFC83D" stroke-width="3.5" stroke-linecap="round" opacity="0"/>';
+    }
+    svg += '<circle cx="640" cy="108" r="36" style="fill:var(--field)" stroke="var(--ink)" stroke-width="2.5"/>' +
+      '<circle data-sc="bulb" cx="640" cy="108" r="36" fill="#FFD24A" opacity="0"/>' +
+      '<path d="M626 116 q7 -20 14 0 q7 20 14 0" fill="none" style="stroke:var(--ink)" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<rect x="624" y="142" width="32" height="24" rx="4" style="fill:var(--line)" stroke="var(--ink)" stroke-width="2.5"/>' +
+      '<line x1="624" y1="150" x2="656" y2="150" style="stroke:var(--ink)" stroke-width="2"/><line x1="624" y1="158" x2="656" y2="158" style="stroke:var(--ink)" stroke-width="2"/>';
+    svg += '</svg>';
+    host.innerHTML = svg;
+    SC.ready = true; SC.flow = 0;
+  }
+  function q1(sel) { return $('scene').querySelector(sel); }
+  function qa(sel) { return $('scene').querySelectorAll(sel); }
+  function updateScene(t, animate) {
+    var res = state.res, p = state.p;
+    if (!res || !SC.ready) return;
+    var k = Math.min(res.N - 1, Math.max(0, Math.round(t / res.h)));
+    var vc = res.vc[k], cutNow = !!res.cut[k], cur = res.i[k];
+    var f = Math.max(0, Math.min(1, vc / p.vs)), hpx = SC.tankH * f;
+    qa('[data-sc=fill]').forEach(function (r) {
+      r.setAttribute('y', (SC.tankTop + SC.tankH - hpx).toFixed(1)); r.setAttribute('height', hpx.toFixed(1));
+      r.style.fill = cutNow ? 'var(--desc)' : 'var(--carga)';
+    });
+    var on = cutNow && vc > p.vmin, b = 0;
+    if (on) b = Math.max(0.06, Math.min(1, Math.pow((vc - p.vmin) / Math.max(p.vs - p.vmin, 1e-9), 0.6)));
+    q1('[data-sc=glow]').setAttribute('opacity', (b * 0.9).toFixed(3));
+    q1('[data-sc=bulb]').setAttribute('opacity', b.toFixed(3));
+    qa('[data-sc=ray]').forEach(function (r) {
+      var a = parseFloat(r.getAttribute('data-a')), len = 50 + 6 + 22 * b;
+      r.setAttribute('x2', (640 + Math.cos(a) * len).toFixed(1)); r.setAttribute('y2', (108 + Math.sin(a) * len).toFixed(1));
+      r.setAttribute('opacity', b > 0 ? (0.25 + 0.75 * b).toFixed(3) : '0');
+    });
+    q1('[data-sc=panel]').setAttribute('opacity', cutNow ? '0.3' : '1');
+    q1('[data-sc=flow1]').setAttribute('opacity', cutNow ? '0' : '1');
+    q1('[data-sc=flow2]').setAttribute('opacity', cutNow ? '1' : '0');
+    if (animate) {
+      SC.flow += 0.8 + 5 * (cur / (state.imax || 1));
+      var off = (-SC.flow).toFixed(1);
+      q1('[data-sc=flow1]').setAttribute('stroke-dashoffset', off); q1('[data-sc=flow2]').setAttribute('stroke-dashoffset', off);
+    }
+    function ifmt(i) { return i < 1 ? fmt(i * 1000, 1) + ' mA' : fmt(i, 2) + ' A'; }
+    $('sPanel').textContent = cutNow ? 'Sin suministro (corte)' : 'Cargando el banco';
+    $('sPanelS').textContent = cutNow ? 'El panel no entrega energía' : 'Entrega ' + ifmt(cur);
+    $('sBank').textContent = fmt(vc, 2) + ' V';
+    $('sBankS').textContent = Math.round(f * 100) + ' % del voltaje del panel · ' + fmt(res.e[k], 2) + ' J';
+    if (!cutNow) { $('sBulb').textContent = 'En espera'; $('sBulbS').textContent = 'Solo enciende durante el corte'; }
+    else if (on) { $('sBulb').textContent = 'Encendida · brillo ' + Math.round(b * 100) + ' %'; $('sBulbS').textContent = 'Consume ' + ifmt(cur); }
+    else { $('sBulb').textContent = 'Apagada'; $('sBulbS').textContent = 'El banco (' + fmt(vc, 2) + ' V) bajó del mínimo (' + fmt(p.vmin) + ' V)'; }
+  }
+
+  /* ---------- ejecución y reproducción ---------- */
+  var DUR = 8000; // ms que dura la reproducción a velocidad normal
+
+  function setClip(prog) {
+    var pw = state.layout ? state.layout.pw : 0, w = (pw * prog + 3).toFixed(1);
+    document.querySelectorAll('[data-clip]').forEach(function (r) { r.setAttribute('width', w); });
+  }
+  function syncButtons() {
+    var idle = state.mode === 'idle';
+    $('runBtn').textContent = idle ? 'Iniciar simulación' : 'Reiniciar simulación';
+    $('pauseBtn').disabled = idle;
+    $('skipBtn').disabled = idle;
+    $('pauseBtn').textContent = state.mode === 'playing' ? 'Pausar' : 'Continuar';
+  }
+  function paintProgress() {
+    var p = state.p, res = state.res;
+    if (!p || !res) return;
+    var t = state.prog * p.tt;
+    setClip(state.prog);
+    $('fill').style.width = (state.prog * 100).toFixed(1) + '%';
+    if (state.mode === 'idle') {
+      $('playText').textContent = 'Simulación completa · ' + fmt(p.tt, 0) + ' s simulados';
+      updateScene(p.tt, false);
+    } else {
+      var k = Math.min(res.N - 1, Math.max(0, Math.round(t / res.h)));
+      $('playText').textContent = 't = ' + fmt(t, t >= 100 ? 0 : 1) + ' s de ' + fmt(p.tt, 0) + ' s · ' + (res.cut[k] ? 'corte' : 'carga');
+      if (!state.hover) setCursor(t);
+      updateScene(t, state.mode === 'playing');
+    }
+  }
+  function tick() {
+    var now = Date.now(), dt = now - state.last;
+    state.last = now;
+    state.prog = Math.min(1, state.prog + dt * state.speed / DUR);
+    if (state.prog >= 1) { finish(); return; }
+    paintProgress();
+  }
+  function play() {
+    clearInterval(state.timer);
+    state.mode = 'playing'; state.last = Date.now();
+    state.timer = setInterval(tick, 33);
+    syncButtons();
+  }
+  function pause() { clearInterval(state.timer); state.timer = null; state.mode = 'paused'; syncButtons(); }
+  function finish() {
+    clearInterval(state.timer); state.timer = null;
+    state.prog = 1; state.mode = 'idle'; state.cursorT = null;
+    if (!state.hover) hideCursor();
+    paintProgress(); syncButtons();
+  }
+
+  function markDirty() {
+    state.dirty = true;
+    $('staleNote').hidden = false;
+    $('results').classList.add('is-stale');
+  }
+  function commit(animate) {
+    var p = readParams(), bad = validate(p);
+    if (bad) { showMsg(bad); return false; }
+    var res;
+    try { res = simulate(p); } catch (e) { showMsg(e.message); return false; }
+    showMsg('');
+    state.p = p; state.res = res; state.idx = sampleIdx(res.N);
+    state.imax = 1e-12; for (var ii = 0; ii < res.N; ii++) { if (res.i[ii] > state.imax) state.imax = res.i[ii]; }
+    state.dirty = false; state.cursorT = null;
+    buildScene();
+    $('staleNote').hidden = true; $('results').classList.remove('is-stale');
+    renderKpis(); renderValidation();
+    clearInterval(state.timer); state.timer = null;
+    state.prog = animate ? 0 : 1; state.mode = animate ? 'paused' : 'idle';
+    drawCharts();
+    if (!animate) hideCursor();
+    paintProgress();
+    if (animate) play(); else syncButtons();
+    return true;
+  }
+  function refreshView() { if (!state.res) return; renderValidation(); drawCharts(); }
 
   /* ---------- mediciones escritas o cargadas ---------- */
   function parsePasted(text) {
@@ -634,7 +1005,7 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     });
     return pts;
   }
-  function readMeas() {
+  function applyMeas() {
     var text = $('meas').value, pts = parsePasted(text), st = $('measStatus');
     if (pts.length >= 2) {
       state.exp = pts; state.expName = 'mediciones escritas o cargadas';
@@ -643,8 +1014,8 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
       state.exp = null; state.expName = '';
       st.textContent = text.trim() ? 'Escriba al menos 2 líneas con tiempo y voltaje (use punto decimal).' : 'Sin mediciones (opcional).';
     }
-    update();
   }
+  function readMeas() { applyMeas(); refreshView(); }
 
   /* ---------- escenarios ---------- */
   var PRESET_TEXT = {
@@ -661,13 +1032,26 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     $('presetNote').textContent = key ? 'Escenario actual: ' + PRESET_TEXT[key] : 'Escenario actual: personalizado (usted cambió algún valor).';
   }
 
+  var ARR_HINT = {
+    paralelo: 'Todos los capacitores lado a lado: las capacitancias se suman (Ceq = n·C).',
+    serie: 'Uno detrás de otro: la capacitancia total baja (Ceq = C/n).',
+    mixto: 'Dos ramas iguales en paralelo, cada una con n/2 capacitores en serie (Ceq = 4·C/n). Por eso la cantidad debe ser par y el deslizador avanza de 2 en 2.'
+  };
+  function syncMixto() {
+    var n = $('n'), mixto = $('arreglo').value === 'mixto';
+    setNConstraints();
+    if (mixto && (parseInt(n.value, 10) % 2 !== 0)) n.value = Math.min(10, parseInt(n.value, 10) + 1);
+    $('nOut').textContent = n.value;
+    $('arrHint').textContent = ARR_HINT[$('arreglo').value];
+  }
+
   /* ---------- eventos ---------- */
-  function onEdit() { setActive(null); schedule(); }
+  function onEdit() { syncMixto(); setActive(null); markDirty(); }
   FIELDS.forEach(function (k) { $(k).addEventListener('input', onEdit); $(k).addEventListener('change', onEdit); });
   document.querySelectorAll('[data-preset]').forEach(function (b) {
     b.addEventListener('click', function () {
       var key = b.getAttribute('data-preset');
-      writeParams(PRESETS[key]); setActive(key); state.cursorT = null; update();
+      writeParams(PRESETS[key]); syncMixto(); setActive(key); markDirty();
     });
   });
   $('meas').addEventListener('input', readMeas);
@@ -680,15 +1064,24 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     rd.readAsText(f);
   });
   $('sample').addEventListener('click', function () {
-    writeParams(PRESETS.base); setActive('base');
-    $('meas').value = SAMPLE_CSV.replace('tiempo_s,voltaje_v\n', ''); readMeas();
+    writeParams(PRESETS.base); syncMixto(); setActive('base');
+    $('meas').value = SAMPLE_CSV.replace('tiempo_s,voltaje_v\n', ''); applyMeas();
+    commit(false);
   });
+  $('runBtn').addEventListener('click', function () {
+    if (commit(true) && window.innerWidth < 940) { $('playbar').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+  $('pauseBtn').addEventListener('click', function () { if (state.mode === 'playing') pause(); else if (state.mode === 'paused') play(); });
+  $('skipBtn').addEventListener('click', function () { if (state.mode !== 'idle') finish(); });
+  $('speed').addEventListener('change', function () { state.speed = parseFloat($('speed').value) || 1; });
   $('clearExp').addEventListener('click', function () { $('csv').value = ''; $('meas').value = ''; readMeas(); });
   if (window.ResizeObserver) { new ResizeObserver(function () { if (state.res) drawCharts(); }).observe($('plotV')); }
   else { window.addEventListener('resize', function () { if (state.res) drawCharts(); }); }
 
+  document.querySelectorAll('[data-help]').forEach(attachHelp);
+  syncMixto();
   setActive('base');
-  update();
+  commit(false);
 })();
 </script>
 </body>
