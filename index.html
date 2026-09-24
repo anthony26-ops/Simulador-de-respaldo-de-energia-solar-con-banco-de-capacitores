@@ -51,16 +51,7 @@ h1 { font-family: var(--serif); font-size: clamp(1.6rem, 3.4vw, 2.3rem); line-he
 .lead { margin: 0; color: var(--muted); max-width: 70ch; }
 .eyebrow { font-size: 12px; letter-spacing: .09em; text-transform: uppercase; font-weight: 700; color: var(--carga-ink); }
 
-.layout { display: grid; gap: 24px; grid-template-columns: 1fr; align-items: start; }
-@media (min-width: 940px) {
-  .layout { grid-template-columns: 330px minmax(0, 1fr); }
-  .rail { position: sticky; top: 16px; max-height: calc(100vh - 32px); }
-  .rail-scroll { overflow-y: auto; overscroll-behavior: contain; min-height: 0; flex: 1 1 auto; }
-}
 
-.rail { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
-.rail-run { padding: 14px 18px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; background: var(--surface); }
-.rail-scroll { padding: 18px; display: flex; flex-direction: column; gap: 18px; }
 button.big { width: 100%; padding: 12px 14px; font-size: 15px; font-weight: 700; border-radius: 8px; }
 button:disabled { opacity: .45; cursor: default; }
 button:disabled:hover { border-color: var(--line); }
@@ -100,7 +91,7 @@ input[type="file"] { font-size: 12.5px; max-width: 100%; color: var(--muted); }
 
 .msg { background: var(--warn-bg); color: var(--warn-ink); border-radius: 6px; padding: 10px 12px; font-size: 14px; }
 
-.results { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.results { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border-block: 1px solid var(--line); }
 @media (min-width: 720px) { .kpis { grid-template-columns: repeat(4, 1fr); } }
 .kpi { padding: 14px 14px 14px 16px; border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -164,6 +155,30 @@ textarea { width: 100%; min-height: 96px; resize: vertical; font-family: var(--m
 .scene-stats .v { display: block; font-family: var(--serif); font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
 .scene-stats .s { display: block; font-size: 12.5px; color: var(--muted); }
 .is-stale .scene-card { opacity: .45; }
+.controls { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px; }
+.ctl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); gap: 14px 26px; align-items: start; }
+.ctl-grid textarea { min-height: 58px; height: 58px; }
+.controls fieldset { gap: 6px; }
+.controls .row { min-height: 0; }
+.ctl-grid .row { grid-template-columns: 1fr 98px; }
+.play-row #runBtn { width: auto; padding: 9px 18px; font-size: 14.5px; }
+.playbar { scroll-margin-top: 8px; }
+.sim-grid { display: grid; grid-template-columns: 1fr; gap: 14px; align-items: start; }
+.sim-left, .sim-right { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+@media (min-width: 1000px) {
+  .steps { columns: 2; column-gap: 34px; max-width: none; }
+  .steps li { break-inside: avoid; }
+  .sim-grid { grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.3fr); }
+  .sim-left .scene-card .capt, .sim-right .chart .capt { display: none; }
+  .sim-left .kpis { grid-template-columns: repeat(2, 1fr); }
+  .sim-left .kpi { border-left: 1px solid var(--line); padding: 8px 10px; }
+  .sim-left .kpi:nth-child(odd) { border-left: 0; padding-left: 0; }
+  .sim-left .kpi:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .sim-left .kpi .v { font-size: 1.35rem; }
+  .sim-left .scene-stats .v { font-size: 1.02rem; }
+  .sim-left .kpi:first-child { border-left: 0; padding-left: 0; }
+  .sim-right .chart-head { margin-bottom: 2px; }
+}
 footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
 </style>
 </head>
@@ -174,21 +189,14 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     <h1>Simulador de respaldo solar con banco de capacitores</h1>
     <p class="lead">Un panel carga el banco durante el día; cuando hay un corte, el banco alimenta una carga (LED). Cambie los valores y observe cómo cambian el voltaje, la corriente y la energía.</p>
     <ol class="steps">
-      <li>Elija un <b>escenario de ejemplo</b> (botones de la izquierda) o cambie los valores del circuito.</li>
+      <li>Elija un <b>escenario de ejemplo</b> (botones de abajo) o cambie los valores del circuito.</li>
       <li>Pulse <b>«Iniciar simulación»</b>: el escenario corre y las gráficas se dibujan segundo a segundo.</li>
       <li>Lea los <b>cuatro indicadores</b> y observe las <b>gráficas</b>: voltaje, corriente y energía mientras hay sol y durante el corte.</li>
-      <li>Opcional: si construyó el circuito, <b>compare con sus mediciones</b> (última sección de la izquierda).</li>
+      <li>Opcional: si construyó el circuito, <b>compare con sus mediciones</b> (última sección de los controles).</li>
     </ol>
   </header>
 
-  <div class="layout">
-    <form class="rail" id="rail" onsubmit="return false" autocomplete="off">
-      <div class="rail-run">
-        <div class="run-line" data-help="run"><button type="button" id="runBtn" class="primary big">Iniciar simulación</button></div>
-        <p class="note" id="runHint">Elija un escenario o cambie valores y pulse el botón: verá correr la simulación segundo a segundo.</p>
-        <p class="cur-note" id="presetNote" role="status"></p>
-      </div>
-      <div class="rail-scroll" id="railScroll">
+  <form class="controls" id="rail" onsubmit="return false" autocomplete="off" aria-label="Controles del escenario">
       <fieldset>
         <legend data-help="fPresets">Escenarios de ejemplo</legend>
         <div class="presets">
@@ -204,9 +212,9 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
           <button type="button" data-preset="consumo" aria-pressed="false">Luz de bajo consumo</button>
           <button type="button" data-preset="corto" aria-pressed="false">Corte corto</button>
         </div>
-
+        <p class="cur-note" id="presetNote" role="status"></p>
       </fieldset>
-
+      <div class="ctl-grid">
       <fieldset>
         <legend data-help="fFuente">Fuente y resistencias</legend>
         <div class="row"><label for="vs" data-help="vs">Voltaje del panel <span class="hint">V<sub>s</sub></span></label><div class="field"><input id="vs" type="number" step="any" min="0.1" value="5"><span class="unit">V</span></div></div>
@@ -214,7 +222,6 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
         <div class="row"><label for="rl" data-help="rl">Resistencia de la carga <span class="hint">R<sub>L</sub> (LED)</span></label><div class="field"><input id="rl" type="number" step="any" min="0.1" value="1000"><span class="unit">Ω</span></div></div>
         <div class="row"><label for="vmin" data-help="vmin">Voltaje mínimo útil <span class="hint">debajo, el LED no funciona</span></label><div class="field"><input id="vmin" type="number" step="any" min="0" value="1.8"><span class="unit">V</span></div></div>
       </fieldset>
-
       <fieldset>
         <legend data-help="fBanco">Banco de capacitores</legend>
         <div class="row"><label for="c" data-help="c">Capacitancia de cada uno <span class="hint">4700 µF = 0.0047 F</span></label><div class="field"><input id="c" type="number" step="any" min="0.000001" value="1"><span class="unit">F</span></div></div>
@@ -225,7 +232,6 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
         <div class="row"><label for="arreglo" data-help="arreglo">Conexión</label><select id="arreglo"><option value="paralelo">Paralelo</option><option value="serie">Serie</option><option value="mixto">Mixto</option></select></div>
         <p class="note" id="arrHint"></p>
       </fieldset>
-
       <fieldset>
         <legend data-help="fTiempo">Escenario en el tiempo</legend>
         <div class="row"><label for="tt" data-help="tt">Duración simulada</label><div class="field"><input id="tt" type="number" step="any" min="1" value="900"><span class="unit">s</span></div></div>
@@ -234,12 +240,10 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
         <div class="row"><label for="metodo" data-help="metodo">Método numérico</label><select id="metodo"><option value="rk4">Runge-Kutta 4</option><option value="euler">Euler</option></select></div>
         <div class="row"><label for="dt" data-help="dt">Paso de cálculo <span class="hint">más chico = más lento</span></label><div class="field"><input id="dt" type="number" step="any" min="0.001" value="0.05"><span class="unit">s</span></div></div>
       </fieldset>
-
       <fieldset>
         <legend data-help="fMeds">Sus mediciones (opcional)</legend>
-        <p class="note">Solo si construyó el circuito y midió el voltaje del capacitor con un multímetro. Escriba abajo lo que midió, una línea por medición: <b>tiempo en segundos</b>, un espacio o coma, y <b>voltaje en voltios</b>. Los puntos aparecen en la gráfica de voltaje y se calcula el error. Si no tiene mediciones, ignore esta sección.</p>
-        <div class="hostrow"><label for="meas" data-help="meas" style="font-size:14px">Sus mediciones</label></div>
-        <textarea id="meas" spellcheck="false" placeholder="0, 0.02&#10;20, 0.55&#10;40, 0.98&#10;(tiempo en s, voltaje en V; use punto decimal)"></textarea>
+        <div class="hostrow"><label for="meas" data-help="meas" style="font-size:14px">Tiempo (s) y voltaje (V), uno por línea</label></div>
+        <textarea id="meas" spellcheck="false" placeholder="0, 0.02&#10;20, 0.55&#10;40, 0.98"></textarea>
         <p class="note" id="measStatus">Sin mediciones (opcional).</p>
         <div class="presets">
           <button type="button" id="sample">Ver un ejemplo</button>
@@ -250,16 +254,16 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
           <p class="note">Un archivo de texto con dos columnas (tiempo_s, voltaje_v). Su contenido se copia en el cuadro de arriba.</p>
           <input id="csv" type="file" accept=".csv,text/csv,text/plain" aria-label="Archivo CSV con columnas tiempo_s y voltaje_v">
         </details>
-        <p class="note">El ejemplo son datos sintéticos: sirven solo para ver cómo funciona.</p>
       </fieldset>
       </div>
-    </form>
+  </form>
 
     <main class="results" id="results">
       <div id="msg" class="msg" role="alert" hidden></div>
 
       <section class="playbar" id="playbar" aria-label="Reproducción de la simulación">
         <div class="play-row" data-help="play">
+          <button type="button" id="runBtn" class="primary big">Iniciar simulación</button>
           <button type="button" id="pauseBtn" disabled>Pausar</button>
           <button type="button" id="skipBtn" disabled>Ver resultado final</button>
           <label class="sp" for="speed">Velocidad
@@ -271,6 +275,8 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
         <p class="stale-note" id="staleNote" hidden>Cambió el escenario: pulse «Iniciar simulación» para ver su resultado. Abajo sigue el resultado anterior.</p>
       </section>
 
+      <div class="sim-grid">
+        <div class="sim-left">
       <section class="scene-card" id="sceneCard" aria-label="Vista del circuito">
         <div class="scene-head"><h2 data-help="scene">Vista del circuito</h2></div>
         <p class="capt">Así se ve el circuito mientras corre la simulación: el banco se llena con el sol y, cuando se va la luz, alimenta el foco. Cambie un valor y compare cómo se comporta el foco.</p>
@@ -289,15 +295,8 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
         <div class="kpi"><span class="k" data-help="kAut">Autonomía útil</span><span class="v" id="kAut">—</span><span class="s" id="kAutS"></span><span class="chip" id="kAutChip" hidden></span></div>
       </section>
 
-      <section class="valid" id="valid" aria-label="Comparación con mediciones" hidden>
-        <div class="valid-head"><span class="k" data-help="valid">Comparación con mediciones</span></div>
-        <div><div class="k">Puntos medidos</div><div class="v" id="vN">0</div></div>
-        <div><div class="k">Error relativo medio</div><div class="v" id="vMean">—</div></div>
-        <div><div class="k">Error relativo máximo</div><div class="v" id="vMax">—</div></div>
-        <div><div class="k">Error absoluto medio</div><div class="v" id="vAbs">—</div></div>
-        <div class="wide" id="vNote"></div>
-      </section>
-
+        </div>
+        <div class="sim-right">
       <section class="chart">
         <div class="chart-head"><h2 data-help="gV">Voltaje del banco</h2>
           <div class="legend">
@@ -323,6 +322,18 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
       </section>
       <div class="readout-row"><div class="readout" id="readout" aria-live="off">Pase el cursor (o el dedo) sobre las gráficas para leer valores.</div><span data-help="readout"></span></div>
 
+        </div>
+      </div>
+
+      <section class="valid" id="valid" aria-label="Comparación con mediciones" hidden>
+        <div class="valid-head"><span class="k" data-help="valid">Comparación con mediciones</span></div>
+        <div><div class="k">Puntos medidos</div><div class="v" id="vN">0</div></div>
+        <div><div class="k">Error relativo medio</div><div class="v" id="vMean">—</div></div>
+        <div><div class="k">Error relativo máximo</div><div class="v" id="vMax">—</div></div>
+        <div><div class="k">Error absoluto medio</div><div class="v" id="vAbs">—</div></div>
+        <div class="wide" id="vNote"></div>
+      </section>
+
       <details>
         <summary>Qué significa cada dato y cómo leer las gráficas</summary>
         <ul class="kdesc">
@@ -342,7 +353,6 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
         </ul>
       </details>
     </main>
-  </div>
   <footer>Proyecto final de Física II · Universidad Mariano Gálvez de Guatemala. Funciona sin conexión: todo el cálculo ocurre en este navegador.</footer>
 </div>
 
@@ -583,7 +593,8 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
   function drawCharts() {
     var res = state.res, p = state.p;
     if (!res) return;
-    var host = $('plotV'), W = Math.max(280, Math.floor(host.clientWidth || 600)), H = W < 460 ? 210 : 250;
+    var host = $('plotV'), W = Math.max(280, Math.floor(host.clientWidth || 600));
+    var H = window.innerWidth >= 1000 ? Math.max(118, Math.min(230, Math.floor((window.innerHeight - 250) / 3 - 34))) : (W < 460 ? 210 : 250);
     var idx = state.idx;
     var maxV = 0, maxI = 0, maxE = 0, k;
     for (k = 0; k < res.N; k++) { if (res.vc[k] > maxV) maxV = res.vc[k]; if (res.i[k] > maxI) maxI = res.i[k]; if (res.e[k] > maxE) maxE = res.e[k]; }
@@ -706,9 +717,6 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
 
   /* ---------- ayuda «!» ---------- */
   var HELP = {
-    run: { t: 'Iniciar simulación', r: [
-      ['Qué hace', 'Ejecuta el escenario con los valores que hay en el panel y lo reproduce segundo a segundo: el banco se carga, llega el corte y la luz de emergencia se enciende o no.'],
-      ['Importante', 'Cambiar casillas o elegir un escenario solo prepara los valores. El resultado cambia cuando usted pulsa este botón.']] },
     fPresets: { t: 'Escenarios de ejemplo', r: [
       ['Qué son', 'Once situaciones ya preparadas para comparar casos típicos sin escribir valores: distintos bancos, conexiones, voltajes del panel, resistencias, consumos y cortes.'],
       ['Cómo se usan', 'Pulse uno para cargar sus valores y luego «Iniciar simulación». El botón azul es el elegido; si usted cambia una casilla pasa a «personalizado».']] },
@@ -768,8 +776,9 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     meas: { t: 'Sus mediciones', r: [
       ['Qué es', 'Los voltajes que usted midió en el capacitor con un multímetro. Escriba una medición por línea: tiempo en segundos, un espacio o coma, y voltaje en voltios (con punto decimal).'],
       ['Qué hace', 'Se dibujan como puntos negros en la gráfica de voltaje y se calcula el error contra la simulación. Es opcional.']] },
-    play: { t: 'Reproducción', r: [
-      ['Qué es', 'Los controles de la animación del escenario.'],
+    play: { t: 'Iniciar y reproducir', r: [
+      ['Iniciar simulación', 'Ejecuta el escenario con los valores de los controles y lo reproduce segundo a segundo. Cambiar casillas o elegir un escenario solo prepara los valores: el resultado cambia al pulsar este botón.'],
+      ['Qué es el resto', 'Los controles de la animación del escenario.'],
       ['Pausar / Continuar', 'Detiene la animación en el instante actual y la reanuda.'],
       ['Ver resultado final', 'Salta al final y muestra las curvas completas.'],
       ['Velocidad', 'Lenta 16 s, normal 8 s, rápida 4 s o muy rápida 2 s para recorrer todo el escenario.'],
@@ -1094,14 +1103,14 @@ footer { margin-top: 30px; font-size: 12.5px; color: var(--muted); }
     commit(false);
   });
   $('runBtn').addEventListener('click', function () {
-    if (commit(true) && window.innerWidth < 940) { $('playbar').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    if (commit(true)) { $('playbar').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   });
   $('pauseBtn').addEventListener('click', function () { if (state.mode === 'playing') pause(); else if (state.mode === 'paused') play(); });
   $('skipBtn').addEventListener('click', function () { if (state.mode !== 'idle') finish(); });
   $('speed').addEventListener('change', function () { state.speed = parseFloat($('speed').value) || 1; });
   $('clearExp').addEventListener('click', function () { $('csv').value = ''; $('meas').value = ''; readMeas(); });
   if (window.ResizeObserver) { new ResizeObserver(function () { if (state.res) drawCharts(); }).observe($('plotV')); }
-  else { window.addEventListener('resize', function () { if (state.res) drawCharts(); }); }
+  window.addEventListener('resize', function () { if (state.res) drawCharts(); });
 
   document.querySelectorAll('[data-help]').forEach(attachHelp);
   syncMixto();

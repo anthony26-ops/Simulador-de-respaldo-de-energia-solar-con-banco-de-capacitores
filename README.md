@@ -30,8 +30,8 @@ Es una **página web de un solo archivo** (`index.html`). No requiere instalaci�
 
 Una vez abierta la página:
 
-1. Elegir un **escenario de ejemplo** (botones de la izquierda) o cambiar los valores del circuito. El botón activo se resalta en azul y la línea «Escenario actual» describe lo que se está viendo. Esto solo **prepara** el escenario.
-2. Pulsar **«Iniciar simulación»** (botón azul, siempre visible arriba del panel izquierdo). El escenario **corre segundo a segundo**: las curvas se dibujan de izquierda a derecha.
+1. Elegir un **escenario de ejemplo** (botones de la barra de controles, debajo de las instrucciones) o cambiar los valores del circuito. El botón activo se resalta en azul y la línea «Escenario actual» describe lo que se está viendo. Esto solo **prepara** el escenario.
+2. Pulsar **«Iniciar simulación»** (botón azul, a la izquierda de la barra de reproducción). El escenario **corre segundo a segundo**: las curvas se dibujan de izquierda a derecha.
 3. Leer los **cuatro indicadores** de la parte superior: capacitancia equivalente, constante de tiempo, energía al iniciar el corte y autonomía útil.
 4. Observar las **tres gráficas**: voltaje, corriente y energía en el tiempo. La franja azul clara es el corte eléctrico.
 5. *(Opcional)* Si se construyó el circuito real, escribir las mediciones de laboratorio en el cuadro «Sus mediciones» para compararlas con la simulación.
@@ -42,7 +42,7 @@ Una vez abierta la página:
 
 **Ayuda con «?».** Junto a cada control, cada grupo y cada cuadro de resultados hay un pequeño botón «?». Al pulsarlo se despliega una explicación de **qué es ese dato y qué modifica si se sube o si se baja** (por ejemplo, qué pasa al subir o bajar el voltaje del panel, o al aumentar o disminuir la cantidad de capacitores).
 
-**Panel con desplazamiento propio.** El panel izquierdo tiene su propia barra de desplazamiento: al recorrer los controles, los resultados de la derecha no se mueven.
+**Todo en una sola vista.** Los controles están en una barra horizontal debajo de las instrucciones. Debajo, la simulación completa (la barra de reproducción, la vista del circuito con los indicadores a la izquierda y las tres gráficas a la derecha) cabe en una sola pantalla sin desplazarse: las gráficas ajustan su altura al tamaño de la ventana. Al pulsar «Iniciar simulación», la página se desplaza sola hasta la simulación.
 
 ## 3. Qué controla cada dato
 
@@ -89,7 +89,7 @@ El manual de usuario (PDF) explica cada gráfica con más detalle.
 
 ## 6. Escenarios de ejemplo incluidos
 
-Once botones en el panel izquierdo cargan situaciones ya preparadas (después se pulsa «Iniciar simulación»):
+Once botones en la barra de controles cargan situaciones ya preparadas (después se pulsa «Iniciar simulación»):
 
 | Botón | Qué cambia respecto al Base | Qué se obtiene |
 |---|---|---|
