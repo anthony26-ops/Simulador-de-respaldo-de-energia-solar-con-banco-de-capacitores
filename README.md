@@ -1,0 +1,1 @@
+# Simulador-de-respaldo-de-energia-solar-con-banco-de-capacitores
