@@ -1,11 +1,6 @@
 # Simulador RC Solar
 
 **Simulador web de un sistema de respaldo de energía solar con banco de capacitores (circuito RC).**
-Proyecto final de Física II — Universidad Mariano Gálvez de Guatemala — Inga. Diana Ruiz Cifuentes.
-
-> **Demo en línea:** `https://USUARIO.github.io/NOMBRE-DEL-REPOSITORIO/`
-> (reemplace `USUARIO` y `NOMBRE-DEL-REPOSITORIO` por los suyos una vez activado GitHub Pages; ver la sección *Publicar en GitHub Pages*).
-
 ---
 
 ## 1. ¿Qué es?
