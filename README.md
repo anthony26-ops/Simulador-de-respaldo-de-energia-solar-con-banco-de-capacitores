@@ -168,13 +168,3 @@ Si además se desea guardar todo el proyecto del curso, pueden agregarse (no son
 ## 12. Compatibilidad
 
 Navegadores recientes: Chrome, Edge, Firefox, Safari y Brave, en Windows, macOS, Linux, Android e iOS. Se adapta a pantallas de celular y tiene tema claro y oscuro automático.
-
-## 13. Integrantes
-
-- [Nombre 1] — [Carné]
-- [Nombre 2] — [Carné]
-- [Nombre 3] — [Carné]
-- [Nombre 4] — [Carné]
-- [Nombre 5] — [Carné]
-
-Catedrática: Inga. Diana Ruiz Cifuentes — Física II, 2026.
